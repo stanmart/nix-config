@@ -72,10 +72,10 @@
           ];
         };
 
-        # OrbStack VM (x86_64)
+        # OrbStack VM (aarch64)
         # Note: Doesn't use mkHost because it imports OrbStack's own configs
         orbstack = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+          system = "aarch64-linux";
           specialArgs = { inherit self; };
           modules = [
             ./hosts/orbstack/default.nix

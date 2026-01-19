@@ -42,9 +42,7 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    syntaxHighlighting.enable = true;
-    autosuggestion.enable = true;
-
+    
     shellAliases = {
       cat = "bat -pp";
       ls = "ls --color=auto";

@@ -2,18 +2,10 @@
 { config, pkgs, ... }:
 
 {
-  # Enable flakes
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Base system packages
-  environment.systemPackages = with pkgs; [
-    curl
-    git
-    cloudflared
+  imports = [
+    ./minimal.nix
   ];
-
-  # Enable zsh system-wide (availability only, not configuration)
-  programs.zsh.enable = true;
 
   # User definition
   users.users.stanmart = {
@@ -27,9 +19,6 @@
 
   # Disable root password for security
   users.users.root.hashedPassword = "!";
-
-  # Enable nix-ld for running dynamically linked binaries
-  programs.nix-ld.enable = true;
 
   # SSH configuration (hardened)
   services.openssh = {
