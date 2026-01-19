@@ -68,4 +68,20 @@
     enable = true;
     autoPrune.enable = true;
   };
+
+  # cloudflared tunnel service
+  systemd.services.cloudflared = {
+    description = "Cloudflare Tunnel";
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+
+    serviceConfig = {
+      ExecStartPre = "${pkgs.coreutils}/bin/test -s /var/lib/cloudflared/token";
+      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel run --token-file /var/lib/cloudflared/token";
+      Restart = "on-failure";
+      RestartSec = 2;
+    };
+  };
+
 }
