@@ -6,6 +6,9 @@
   ...
 }:
 {
+  imports = [
+    ../../modules/pihole.nix
+  ];
 
   # System state version
   system.stateVersion = "24.05";
@@ -20,5 +23,16 @@
     fsType = "ext4";
   };
 
-  # Pi-hole will be added later as a Docker container
+  pihole = {
+    interface = "eth0";
+    enableDhcp = true;
+    hostIp = "192.168.8.188";
+  };
+
+  services.tailscale.extraUpFlags = [
+    "--advertise-routes=true"
+  ];
+
+  # The device will be its own DNS provider
+  services.resolved.enable = false;
 }
