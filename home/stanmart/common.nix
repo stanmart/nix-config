@@ -34,7 +34,7 @@
     nix-direnv.enable = true;
   };
 
-  # Zsh configuration
+  # Basic zsh configuration (can be overridden by oh-my-zsh module)
   programs.zsh = {
     enable = true;
     enableCompletion = true;
@@ -42,14 +42,10 @@
     autosuggestion.enable = true;
 
     shellAliases = {
-      cat = "bat";
+      cat = "bat -pp";
       ls = "ls --color=auto";
       ll = "ls -lah";
     };
-
-    initContent = ''
-      # Additional zsh configuration can go here
-    '';
   };
 
   # Git configuration
