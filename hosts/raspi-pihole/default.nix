@@ -6,6 +6,9 @@
   ...
 }:
 {
+  imports = [
+    ../../modules/pihole.nix
+  ];
 
   # System state version
   system.stateVersion = "24.05";
@@ -20,5 +23,20 @@
     fsType = "ext4";
   };
 
-  # Pi-hole will be added later as a Docker container
+
+  # your existing raspi settings...
+  system.stateVersion = "24.05";
+  boot.loader.grub.enable = false;
+  boot.loader.generic-extlinux-compatible.enable = true;
+
+  fileSystems."/" = {
+    device = "/dev/disk/by-label/NIXOS_SD";
+    fsType = "ext4";
+  };
+
+  pihole = {
+    interface = "eth0";
+    enableDhcp = true;
+    hostIp = "192.168.8.188";
+  };
 }
