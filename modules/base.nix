@@ -46,6 +46,11 @@
   # Tailscale
   services.tailscale = {
     enable = true;
+    extraUpFlags = [
+      "--ssh"
+      "--advertise-exit-node"
+      "--accept-routes"
+    ];
   };
 
   # Firewall configuration
