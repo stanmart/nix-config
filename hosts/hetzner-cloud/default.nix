@@ -13,8 +13,10 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
-    ../../modules/cloud.nix
   ];
+
+  # No password prompt for sudo
+  security.sudo.wheelNeedsPassword = false;
 
   # Boot loader configuration for GRUB with EFI
   boot.loader.grub = {

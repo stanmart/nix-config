@@ -58,18 +58,18 @@ nixos-rebuild switch \
 
 ```
 ├── flake.nix              # Multi-host entry point
-├── modules/base.nix       # Shared system config
+├── modules/
+│   ├── base.nix           # Shared system config
+│   └── minimal.nix        # Minimal system settings
 ├── hosts/
 │   ├── hetzner-cloud/     # Server configuration
 │   ├── raspi-pihole/      # Raspberry Pi configuration
 │   ├── desktop/           # Desktop configuration
 │   └── orbstack/          # OrbStack VM configuration
 └── home/stanmart/
-    ├── common.nix         # Shared user config
-    ├── hetzner.nix        # Server-specific user config
-    ├── raspi.nix          # Pi-specific user config
+    ├── common.nix         # Shared user config (all hosts)
     ├── desktop.nix        # Desktop-specific user config
-    └── orbstack.nix       # OrbStack-specific user config
+    └── oh-my-zsh.nix      # Oh-My-Zsh + Powerlevel10k (raspi, desktop, orbstack)
 ```
 
 See [`.github/copilot-instructions.md`](.github/copilot-instructions.md) for architectural details.
@@ -82,4 +82,4 @@ See [`.github/copilot-instructions.md`](.github/copilot-instructions.md) for arc
 - **Desktop**: GNOME, PipeWire
 - **Raspberry Pi**: Docker for containers (Pi-hole coming later)
 - **OrbStack**: Development tools
-- **User Tools**: git, zsh, direnv, pixi, uv, bat, fzf, fd, delta, htop, tmux
+- **User Tools**: git, zsh, direnv, pixi, uv, bat, fzf, fd, ripgrep, delta, vim, micro, htop, tmux, fastfetch, wget

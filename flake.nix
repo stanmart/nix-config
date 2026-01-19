@@ -44,7 +44,7 @@
             ./hosts/hetzner-cloud/default.nix
           ];
           homeModules = [
-            ./home/stanmart/hetzner.nix
+            ./home/stanmart/simple-shell.nix
           ];
         };
 
@@ -56,7 +56,7 @@
             ./hosts/raspi-pihole/default.nix
           ];
           homeModules = [
-            ./home/stanmart/raspi.nix
+            ./home/stanmart/fancy-shell.nix
           ];
         };
 
@@ -69,13 +69,14 @@
           ];
           homeModules = [
             ./home/stanmart/desktop.nix
+            ./home/stanmart/fancy-shell.nix
           ];
         };
 
-        # OrbStack VM (x86_64)
+        # OrbStack VM (aarch64)
         # Note: Doesn't use mkHost because it imports OrbStack's own configs
         orbstack = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+          system = "aarch64-linux";
           specialArgs = { inherit self; };
           modules = [
             ./hosts/orbstack/default.nix
@@ -88,7 +89,7 @@
               home-manager.users.stanmart = { ... }: {
                 imports = [
                   ./home/stanmart/common.nix
-                  ./home/stanmart/orbstack.nix
+                  ./home/stanmart/fancy-shell.nix
                 ];
               };
             }
