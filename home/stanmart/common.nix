@@ -18,6 +18,8 @@
     uv
     vim
     micro
+    htop
+    tmux
   ];
 
   # Environment variables

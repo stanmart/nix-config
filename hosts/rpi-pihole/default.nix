@@ -6,6 +6,10 @@
   ...
 }:
 {
+  imports = [
+    ../../modules/cloud.nix
+  ];
+
   # System state version
   system.stateVersion = "24.05";
 
@@ -19,16 +23,5 @@
     fsType = "ext4";
   };
 
-  # Enable podman for containers
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-    defaultNetwork.settings.dns_enabled = true;
-  };
-
-  # Add docker group compatibility for podman
-  users.users.stanmart.extraGroups = [ "podman" ];
-
-  # Pi-hole will be added later as a container
-  # For now, just ensure the networking is ready
+  # Pi-hole will be added later as a Docker container
 }

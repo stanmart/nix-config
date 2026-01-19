@@ -13,6 +13,7 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
+    ../../modules/cloud.nix
   ];
 
   # Boot loader configuration for GRUB with EFI
@@ -24,15 +25,6 @@
 
   # System state version - don't change this after initial install
   system.stateVersion = "24.05";
-
-  # Add docker group for this host
-  users.users.stanmart.extraGroups = [ "docker" ];
-
-  # Docker
-  virtualisation.docker = {
-    enable = true;
-    autoPrune.enable = true;
-  };
 
   # Caddy reverse proxy
   services.caddy = {

@@ -3,9 +3,6 @@
 { config, pkgs, ... }:
 
 {
-  # Additional packages for server use
-  home.packages = with pkgs; [
-    htop
-    tmux
-  ];
+  # No additional packages needed
+  # htop and tmux are in common.nix
 }

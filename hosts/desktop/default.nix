@@ -6,6 +6,10 @@
   ...
 }:
 {
+  imports = [
+    ../../modules/cloud.nix
+  ];
+
   # System state version
   system.stateVersion = "24.05";
 
@@ -52,11 +56,5 @@
   networking.networkmanager.enable = true;
 
   # Add user to relevant groups
-  users.users.stanmart.extraGroups = [ "networkmanager" "docker" ];
-
-  # Optional: Docker for development
-  virtualisation.docker = {
-    enable = true;
-    autoPrune.enable = true;
-  };
+  users.users.stanmart.extraGroups = [ "networkmanager" ];
 }
