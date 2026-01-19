@@ -39,4 +39,8 @@
     enableDhcp = true;
     hostIp = "192.168.8.188";
   };
+
+  services.tailscale.extraUpFlags = [
+    "--advertise-routes=true"
+  ];
 }

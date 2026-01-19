@@ -232,6 +232,11 @@ in
       }
     ];
 
+    # Disable tailscale DNS override (we want Pi-hole to be the DNS server)
+    services.tailscale.extraUpFlags = lib.mkForce [
+      "--accept-dns=false"
+    ];
+
     # Ensure DHCP server port is open only when DHCP is enabled
     networking.firewall.allowedUDPPorts = optionals cfg.enableDhcp [ 67 ];
 
