@@ -6,9 +6,6 @@
   ...
 }:
 {
-  imports = [
-    ../../modules/cloud.nix
-  ];
 
   # System state version
   system.stateVersion = "24.05";

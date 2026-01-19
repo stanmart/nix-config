@@ -42,9 +42,7 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    syntaxHighlighting.enable = true;
-    autosuggestion.enable = true;
-
+    
     shellAliases = {
       cat = "bat -pp";
       ls = "ls --color=auto";
@@ -62,6 +60,13 @@
       };
       pull.rebase = true;
       core.autocrlf = "input";
+      "url \"git@github.com:\"" = {
+        insteadOf = [
+          "git@github.com:"
+          "http://github.com/"
+          "https://github.com/"
+        ];
+      };
     };
   };
 
