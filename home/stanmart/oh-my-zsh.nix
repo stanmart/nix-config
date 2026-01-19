@@ -7,7 +7,7 @@ let
   fzf-tab = pkgs.fetchFromGitHub {
     owner = "Aloxaf";
     repo = "fzf-tab";
-    rev = "master"; # you can pin to a commit later
+    rev = "cbdc58226a696688d08eae63d8e44f4b230fa3dd";
     sha256 = "sha256-ZekrZYQBGYQOTMojnJbQhelH4rOyzuPIP/Tu/6Tjwec=";
   };
 in
@@ -43,7 +43,7 @@ in
       {
         name = "zsh-autosuggestions";
         src = pkgs.zsh-autosuggestions;
-        file = "share/zsh-autosuggestions/zsh-autosuggestions.zsh";
+        file = "share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh";
       }
       {
         name = "zsh-syntax-highlighting";
