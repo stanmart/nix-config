@@ -13,9 +13,10 @@
     dnsutils
     jq
     lsof
+    tree
   ];
 
-  # Enable zsh system-wide and set it as default shell
+  # Enable zsh system-wide and set it as the default shell
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
 
