@@ -5,7 +5,7 @@ Flake-based NixOS configuration supporting multiple hosts with clean system/user
 ## Hosts
 
 - **hetzner-cloud** — x86_64 server (Hetzner VM)
-- **rpi-pihole** — aarch64 Raspberry Pi (Pi-hole + containers)
+- **raspi-pihole** — aarch64 Raspberry Pi (Pi-hole + containers)
 - **desktop** — x86_64 desktop machine (GNOME)
 
 ## Quick Start
@@ -60,12 +60,12 @@ nixos-rebuild switch \
 ├── modules/base.nix       # Shared system config
 ├── hosts/
 │   ├── hetzner-cloud/     # Server configuration
-│   ├── rpi-pihole/        # Raspberry Pi configuration
+│   ├── raspi-pihole/      # Raspberry Pi configuration
 │   └── desktop/           # Desktop configuration
 └── home/stanmart/
     ├── common.nix         # Shared user config
     ├── hetzner.nix        # Server-specific user config
-    ├── rpi.nix            # Pi-specific user config
+    ├── raspi.nix          # Pi-specific user config
     └── desktop.nix        # Desktop-specific user config
 ```
 

@@ -42,7 +42,7 @@ Secrets are explicitly out of scope for now.
 │   │   ├── default.nix   # migrated from old configuration.nix
 │   │   └── disk-config.nix
 │   │
-│   ├── rpi-pihole/
+│   ├── raspi-pihole/
 │   │   └── default.nix   # aarch64, podman + pihole (initially minimal)
 │   │
 │   └── desktop/
@@ -52,7 +52,7 @@ Secrets are explicitly out of scope for now.
     └── stanmart/
         ├── common.nix    # shared user environment
         ├── hetzner.nix   # server-specific user tweaks
-        ├── rpi.nix       # minimal user env for Pi
+        ├── raspi.nix     # minimal user env for Pi
         └── desktop.nix   # GUI apps, fonts, desktop tooling
 ```
 
@@ -86,7 +86,7 @@ The same user (`stanmart`) gets different Home Manager overlays per host:
 - `common.nix` → everywhere
 - `desktop.nix` → GUI-heavy
 - `hetzner.nix` → server-lean
-- `rpi.nix` → pihole plus a couple of containers
+- `raspi.nix` → pihole plus a couple of containers
 
 The flake wires this automatically based on host name.
 
