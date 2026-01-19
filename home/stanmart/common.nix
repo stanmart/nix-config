@@ -20,6 +20,8 @@
     micro
     htop
     tmux
+    fastfetch
+    wget
   ];
 
   # Environment variables
@@ -31,6 +33,7 @@
   # Direnv
   programs.direnv = {
     enable = true;
+    enableZshIntegration = true;
     nix-direnv.enable = true;
   };
 

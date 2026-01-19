@@ -7,6 +7,7 @@ Flake-based NixOS configuration supporting multiple hosts with clean system/user
 - **hetzner-cloud** — x86_64 server (Hetzner VM)
 - **raspi-pihole** — aarch64 Raspberry Pi (Pi-hole + containers)
 - **desktop** — x86_64 desktop machine (GNOME)
+- **orbstack** — x86_64 local development VM (OrbStack on macOS)
 
 ## Quick Start
 
@@ -26,7 +27,7 @@ hcloud server create \
 ```bash
 nix run github:nix-community/nixos-anywhere -- \
   --flake .#hetzner-cloud \
-  root@<vm-ip>
+  stanmart@<vm-ip>
 ```
 
 3. **Post-deployment** (on the server):
@@ -61,12 +62,14 @@ nixos-rebuild switch \
 ├── hosts/
 │   ├── hetzner-cloud/     # Server configuration
 │   ├── raspi-pihole/      # Raspberry Pi configuration
-│   └── desktop/           # Desktop configuration
+│   ├── desktop/           # Desktop configuration
+│   └── orbstack/          # OrbStack VM configuration
 └── home/stanmart/
     ├── common.nix         # Shared user config
     ├── hetzner.nix        # Server-specific user config
     ├── raspi.nix          # Pi-specific user config
-    └── desktop.nix        # Desktop-specific user config
+    ├── desktop.nix        # Desktop-specific user config
+    └── orbstack.nix       # OrbStack-specific user config
 ```
 
 See [`.github/copilot-instructions.md`](.github/copilot-instructions.md) for architectural details.
@@ -74,7 +77,9 @@ See [`.github/copilot-instructions.md`](.github/copilot-instructions.md) for arc
 ## What's Included
 
 - **Base**: SSH, fail2ban, Tailscale, automatic garbage collection
-- **Hetzner**: Docker, Caddy reverse proxy
-- **Desktop**: GNOME, PipeWire, Docker
-- **Raspberry Pi**: Podman (Pi-hole container coming later)
-- **User Tools**: git, zsh, direnv, pixi, uv, bat, fzf, fd, delta
+- **Cloud**: Passwordless sudo, Docker with auto-pruning
+- **Hetzner**: Caddy reverse proxy
+- **Desktop**: GNOME, PipeWire
+- **Raspberry Pi**: Docker for containers (Pi-hole coming later)
+- **OrbStack**: Development tools
+- **User Tools**: git, zsh, direnv, pixi, uv, bat, fzf, fd, delta, htop, tmux
