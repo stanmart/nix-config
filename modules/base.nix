@@ -71,16 +71,21 @@
 
   # cloudflared tunnel service
   systemd.services.cloudflared = {
-    description = "Cloudflare Tunnel";
+    wantedBy = [ "multi-user.target" ];
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
-
+  
     serviceConfig = {
       ExecStartPre = "${pkgs.coreutils}/bin/test -s /var/lib/cloudflared/token";
       ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel run --token-file /var/lib/cloudflared/token";
       Restart = "on-failure";
       RestartSec = 2;
+    };
+  
+    # Prevent infinite retry spam when token is missing
+    unitConfig = {
+      StartLimitIntervalSec = 60;
+      StartLimitBurst = 2;
     };
   };
 
