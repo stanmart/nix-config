@@ -28,9 +28,6 @@
   # Disable root password for security
   users.users.root.hashedPassword = "!";
 
-  # Passwordless sudo for wheel group
-  security.sudo.wheelNeedsPassword = false;
-
   # Enable nix-ld for running dynamically linked binaries
   programs.nix-ld.enable = true;
 
