@@ -71,6 +71,29 @@
             ./home/stanmart/desktop.nix
           ];
         };
+
+        # OrbStack VM (x86_64)
+        # Note: Doesn't use mkHost because it imports OrbStack's own configs
+        orbstack = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit self; };
+          modules = [
+            ./hosts/orbstack/default.nix
+            
+            # Home Manager
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.stanmart = { ... }: {
+                imports = [
+                  ./home/stanmart/common.nix
+                  ./home/stanmart/orbstack.nix
+                ];
+              };
+            }
+          ];
+        };
       };
     };
 }

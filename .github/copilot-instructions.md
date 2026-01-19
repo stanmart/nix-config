@@ -11,6 +11,7 @@ The repository uses a flake-based, multi-host architecture supporting:
 - a Hetzner VM (server)
 - a Raspberry Pi (Pi-hole + containers)
 - a desktop (GUI, sometimes server-ish)
+- an OrbStack VM (local development on macOS)
 
 This structure provides:
 
@@ -45,15 +46,19 @@ Secrets are explicitly out of scope for now.
 │   ├── raspi-pihole/
 │   │   └── default.nix   # aarch64, podman + pihole (initially minimal)
 │   │
-│   └── desktop/
-│       └── default.nix   # GUI machine, sometimes server-ish
+│   ├── desktop/
+│   │   └── default.nix   # GUI machine, sometimes server-ish
+│   │
+│   └── orbstack/
+│       └── default.nix   # local dev VM on macOS
 │
 └── home/
     └── stanmart/
         ├── common.nix    # shared user environment
         ├── hetzner.nix   # server-specific user tweaks
         ├── raspi.nix     # minimal user env for Pi
-        └── desktop.nix   # GUI apps, fonts, desktop tooling
+        ├── desktop.nix   # GUI apps, fonts, desktop tooling
+        └── orbstack.nix  # local dev environment
 ```
 
 ---
