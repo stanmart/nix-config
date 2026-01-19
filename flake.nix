@@ -43,9 +43,6 @@
             disko.nixosModules.disko
             ./hosts/hetzner-cloud/default.nix
           ];
-          homeModules = [
-            ./home/stanmart/hetzner.nix
-          ];
         };
 
         # Raspberry Pi with Pi-hole (aarch64)
@@ -56,7 +53,7 @@
             ./hosts/raspi-pihole/default.nix
           ];
           homeModules = [
-            ./home/stanmart/raspi.nix
+            ./home/stanmart/oh-my-zsh.nix
           ];
         };
 
@@ -69,6 +66,7 @@
           ];
           homeModules = [
             ./home/stanmart/desktop.nix
+            ./home/stanmart/oh-my-zsh.nix
           ];
         };
 
@@ -88,7 +86,7 @@
               home-manager.users.stanmart = { ... }: {
                 imports = [
                   ./home/stanmart/common.nix
-                  ./home/stanmart/orbstack.nix
+                  ./home/stanmart/oh-my-zsh.nix
                 ];
               };
             }

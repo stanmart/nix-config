@@ -10,6 +10,9 @@
     curl
     git
     cloudflared
+    dnsutils
+    jq
+    lsof
   ];
 
   # Enable zsh system-wide and set it as default shell

@@ -60,6 +60,13 @@
       };
       pull.rebase = true;
       core.autocrlf = "input";
+      "url \"git@github.com:\"" = {
+        insteadOf = [
+          "git@github.com:"
+          "http://github.com/"
+          "https://github.com/"
+        ];
+      };
     };
   };
 
