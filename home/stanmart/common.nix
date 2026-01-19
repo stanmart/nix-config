@@ -13,6 +13,7 @@
     bat
     fzf
     fd
+    ripgrep
     delta
     pixi
     uv
