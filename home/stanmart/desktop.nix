@@ -3,6 +3,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ./oh-my-zsh.nix
+  ];
+
   # Desktop packages
   home.packages = with pkgs; [
     # Browsers

@@ -49,14 +49,14 @@
         };
 
         # Raspberry Pi with Pi-hole (aarch64)
-        rpi-pihole = mkHost {
-          hostname = "rpi-pihole";
+        raspi-pihole = mkHost {
+          hostname = "raspi-pihole";
           system = "aarch64-linux";
           modules = [
-            ./hosts/rpi-pihole/default.nix
+            ./hosts/raspi-pihole/default.nix
           ];
           homeModules = [
-            ./home/stanmart/rpi.nix
+            ./home/stanmart/raspi.nix
           ];
         };
 
