@@ -14,7 +14,6 @@
     fzf
     fd
     ripgrep
-    delta
     pixi
     uv
     vim
@@ -26,7 +25,6 @@
     gcc
     gnumake
     rustup
-    gh
   ];
 
   # Environment variables
@@ -80,6 +78,14 @@
       merge.conflictStyle = "zdiff3";
       grep.lineNumber = true;
       color.ui = "auto";
+    };
+  };
+
+  # Github CLI
+  programs.gh = {
+    enable = true;
+    gitCredentialHelper = {
+      enable = true;
     };
   };
 
