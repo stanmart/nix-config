@@ -58,8 +58,18 @@
         name = "Martin Stancsics";
         email = "martin.stancsics@gmail.com";
       };
+      init.defaultBranch = "main";
       pull.rebase = true;
-      core.autocrlf = "input";
+      push.autoSetupRemote = true;
+      rerere.enabled = true;
+      core = {
+        autocrlf = "input";
+        excludesFile = "~/.gitignore";
+      };
+      gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
+      merge.conflictStyle = "zdiff3";
+      grep.lineNumber = true;
+      color.ui = "auto";
       "url \"git@github.com:\"" = {
         insteadOf = [
           "git@github.com:"
