@@ -2,14 +2,20 @@
 
 [![CI](https://github.com/stanmart/nix/actions/workflows/ci.yml/badge.svg)](https://github.com/stanmart/nix/actions/workflows/ci.yml)
 
-Flake-based NixOS configuration supporting multiple hosts with clean system/user separation.
+Flake-based NixOS configuration supporting multiple hosts with clean system/user separation, plus standalone Home Manager for macOS.
 
 ## Hosts
+
+### NixOS Systems
 
 - **hetzner-cloud** — x86_64 server (Hetzner VM)
 - **raspi-pihole** — aarch64 Raspberry Pi (Pi-hole + containers)
 - **desktop** — x86_64 desktop machine (GNOME)
 - **orbstack** — aarch64 local development VM (OrbStack on macOS)
+
+### Home Manager Only
+
+- **qc-macbook** — aarch64 macOS work laptop (user environment only)
 
 ## Quick Start
 
@@ -46,18 +52,27 @@ git clone https://github.com/stanmart/nix.git
 
 ## Managing Systems
 
-### Local Rebuild (on the target machine)
+### NixOS Systems
+
+#### Local Rebuild (on the target machine)
 ```bash
 sudo nixos-rebuild switch --flake .#hetzner-cloud
 ```
 
-### Remote Rebuild (from your local machine)
+#### Remote Rebuild (from your local machine)
 ```bash
 nixos-rebuild switch \
   --flake .#hetzner-cloud \
   --target-host stanmart@<ip> \
   --sudo
   --build-host stanmart@<ip>  # if different architecture
+```
+
+### macOS Home Manager
+
+On the macOS machine:
+```bash
+nix run home-manager switch --flake .#qc-macbook
 ```
 
 ## Structure
@@ -73,12 +88,17 @@ nixos-rebuild switch \
     └── ...                # Other capability modules (e.g., desktop)
 ```
 
-See [`.github/copilot-instructions.md`](.github/copilot-instructions.md) for architectural details.
-
 ## What's Included
 
+### System Level (NixOS only)
 - **Base**: SSH, security (fail2ban), VPN (Tailscale), automatic cleanup
 - **Hetzner**: Reverse proxy (Caddy), containers (Docker)
 - **Desktop**: GUI (GNOME), graphics (AMD), gaming (Steam), audio (PipeWire)
 - **Raspberry Pi**: DNS/DHCP server (Pi-hole)
-- **User Environment**: Development tools, shell (zsh), version control (git), editors, CLI utilities
+
+### User Environment (all systems)
+- **Common**: Shell (zsh), version control (git), editors, CLI utilities
+- **Dev Tools**: Development tooling for coding projects
+- **Fancy Shell**: Enhanced shell experience with p10k theme
+- **Desktop**: GUI applications and desktop-specific tooling
+- **Work**: Work-specific configuration for macOS laptop

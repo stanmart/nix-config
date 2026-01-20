@@ -34,6 +34,7 @@
       };
     in
     {
+
       nixosConfigurations = {
         # Hetzner cloud server (x86_64)
         hetzner-cloud = mkHost {
@@ -57,6 +58,7 @@
           ];
           homeModules = [
             ./home/stanmart/fancy-shell.nix
+            ./home/stanmart/dev-tools.nix
           ];
         };
 
@@ -71,6 +73,7 @@
             ./home/stanmart/desktop.nix
             ./home/stanmart/fancy-shell.nix
             ./home/stanmart/has-keys.nix
+            ./home/stanmart/dev-tools.nix
           ];
         };
 
@@ -92,9 +95,22 @@
                   ./home/stanmart/common.nix
                   ./home/stanmart/fancy-shell.nix
                   ./home/stanmart/has-keys.nix
+                  ./home/stanmart/dev-tools.nix
                 ];
               };
             }
+          ];
+        };
+      };
+      homeConfigurations = {
+        "qc-macbook" = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages."aarch64-darwin";
+          extraSpecialArgs = { inherit self; };
+          modules = [
+            ./home/stanmart/common.nix
+            ./home/stanmart/fancy-shell.nix
+            ./home/stanmart/has-keys.nix
+            ./home/stanmart/work.nix
           ];
         };
       };
