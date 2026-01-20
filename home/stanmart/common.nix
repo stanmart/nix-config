@@ -26,6 +26,7 @@
     gcc
     gnumake
     rustup
+    gh
   ];
 
   # Environment variables
