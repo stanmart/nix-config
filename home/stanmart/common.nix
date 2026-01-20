@@ -23,6 +23,9 @@
     tmux
     fastfetch
     wget
+    gcc
+    gnumake
+    rustup
   ];
 
   # Environment variables
@@ -30,6 +33,12 @@
     EDITOR = "micro";
     LESS = "-iR";
   };
+
+  # PATH additions
+  home.sessionPath = [
+    "$HOME/.pixi/bin"
+    "$HOME/.cargo/bin"
+  ];
 
   # Direnv
   programs.direnv = {
