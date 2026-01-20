@@ -79,13 +79,6 @@
       merge.conflictStyle = "zdiff3";
       grep.lineNumber = true;
       color.ui = "auto";
-      "url \"git@github.com:\"" = {
-        insteadOf = [
-          "git@github.com:"
-          "http://github.com/"
-          "https://github.com/"
-        ];
-      };
     };
   };
 
