@@ -3,12 +3,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  # Enable the unfree 1Password packages
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-    "1password"
-  ];
-  programs._1password.enable = true;
-
   # Git signing with GPG
   programs.git = {
     signing = {
