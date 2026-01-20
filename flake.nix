@@ -70,6 +70,7 @@
           homeModules = [
             ./home/stanmart/desktop.nix
             ./home/stanmart/fancy-shell.nix
+            ./home/stanmart/has-keys.nix
           ];
         };
 
@@ -90,6 +91,7 @@
                 imports = [
                   ./home/stanmart/common.nix
                   ./home/stanmart/fancy-shell.nix
+                  ./home/stanmart/has-keys.nix
                 ];
               };
             }

@@ -15,23 +15,11 @@
     meslo-lgs-nf
   ];
 
-  # Git signing with GPG
-  programs.git = {
-    signing = {
-      signByDefault = true;
-      key = null; # Uses default GPG key
-    };
-    
-    # Rewrite GitHub URLs to use SSH (requires proper SSH key setup)
-    settings = {
-      "url \"git@github.com:\"" = {
-        insteadOf = [
-          "git@github.com:"
-          "http://github.com/"
-          "https://github.com/"
-        ];
-      };
-    };
+  programs._1password-gui = {
+    enable = true;
+    # Certain features, including CLI integration and system authentication support,
+    # require enabling PolKit integration on some desktop environments (e.g. Plasma).
+    polkitPolicyOwners = [ "stanmart" ];
   };
 
   # Desktop-specific settings can go here
