@@ -29,16 +29,34 @@
     fsType = "vfat";
   };
 
-  # Enable X11 and desktop environment
-  services.xserver.enable = true;
-  
-  # GNOME desktop
+  # AMD Graphics (Ryzen 3300U with Vega iGPU)
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;  # For Steam/gaming
+    extraPackages = with pkgs; [
+      rocmPackages.clr.icd  # OpenCL support
+    ];
+  };
+
+  # X11/Wayland with AMD driver
+  services.xserver = {
+    enable = true;
+    videoDrivers = [ "amdgpu" ];
+  };
+
+  # Display manager and desktop environment
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
-  
-  # Or use KDE Plasma instead:
-  # services.displayManager.sddm.enable = true;
-  # services.desktopManager.plasma6.enable = true;
+
+  # Minimal GNOME (exclude some default apps)
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-tour
+    epiphany  # web browser
+    geary     # email client
+    gnome-contacts
+    gnome-maps
+    gnome-music
+  ];
 
   # Enable sound with PipeWire
   services.pulseaudio.enable = false;
@@ -52,6 +70,16 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
+
+  # Gaming
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+  };
+  programs.gamemode.enable = true;
+
+  # Allow unfree packages (Steam, etc.)
+  nixpkgs.config.allowUnfree = true;
 
   # Add user to relevant groups
   users.users.stanmart.extraGroups = [ "networkmanager" ];
