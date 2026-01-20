@@ -10,6 +10,9 @@
     
     # Desktop tools
     vscode
+    
+    # Fonts
+    meslo-lgs-nf
   ];
 
   # Git signing with GPG
