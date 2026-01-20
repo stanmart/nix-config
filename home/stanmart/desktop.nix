@@ -21,6 +21,17 @@
       signByDefault = true;
       key = null; # Uses default GPG key
     };
+    
+    # Rewrite GitHub URLs to use SSH (requires proper SSH key setup)
+    settings = {
+      "url \"git@github.com:\"" = {
+        insteadOf = [
+          "git@github.com:"
+          "http://github.com/"
+          "https://github.com/"
+        ];
+      };
+    };
   };
 
   # Desktop-specific settings can go here
