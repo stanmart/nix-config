@@ -12,13 +12,6 @@
     vscode
   ];
 
-  programs._1password-gui = {
-    enable = true;
-    # Certain features, including CLI integration and system authentication support,
-    # require enabling PolKit integration on some desktop environments (e.g. Plasma).
-    polkitPolicyOwners = [ "stanmart" ];
-  };
-
   # Desktop-specific settings can go here
   # For example: gtk themes, fonts, etc.
 }

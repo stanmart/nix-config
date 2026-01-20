@@ -7,11 +7,12 @@
 }:
 {
 
+  imports = [
+  ../../modules/onepassword.nix
+  ];
+
   # System state version
   system.stateVersion = "24.05";
-
-  # Allow unfree packages (needed for some desktop apps like vscode)
-  nixpkgs.config.allowUnfree = true;
 
   # Boot loader for UEFI systems
   boot.loader.systemd-boot.enable = true;
@@ -54,4 +55,10 @@
 
   # Add user to relevant groups
   users.users.stanmart.extraGroups = [ "networkmanager" ];
+
+  # 1password GUI enabled
+  onepassword.gui = {
+    enable = true;
+    polkitPolicyOwners = [ "stanmart" ];
+  };
 }

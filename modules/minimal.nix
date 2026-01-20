@@ -5,6 +5,9 @@
   # Enable flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Allow unfree packages (needed for some desktop apps and 1Password)
+  nixpkgs.config.allowUnfree = true;
+
   # Base system packages
   environment.systemPackages = with pkgs; [
     curl
