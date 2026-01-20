@@ -83,11 +83,22 @@ in
         # Key binding
         bindkey '^U' backward-kill-line
 
+        # Ensure prefix history search widgets exist
+        autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+        zle -N up-line-or-beginning-search
+        zle -N down-line-or-beginning-search
+
+        # Bind both common Up/Down escape sequences
+        bindkey '^[[A' up-line-or-beginning-search
+        bindkey '^[[B' down-line-or-beginning-search
+        bindkey '^[OA' up-line-or-beginning-search
+        bindkey '^[OB' down-line-or-beginning-search
+
         # p10k config managed by HM
         [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
         # pixi niceties
-        eval "$(pixi completion --shell zsh)"
+        command -v pixi >/dev/null && eval "$(pixi completion --shell zsh)"
       ''
     ];
   };
@@ -105,5 +116,5 @@ in
   };
 
   # Put your generated p10k config under HM control
-  home.file.".p10k.zsh".source = ./p10k.zsh;
+  home.file.".p10k.zsh".source = ./assets/p10k.zsh;
 }
