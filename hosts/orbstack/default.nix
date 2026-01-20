@@ -1,6 +1,6 @@
 # NixOS configuration for OrbStack VM
 # Local development VM on macOS
-# Meant to be applied from inside the VM: sudo nixos-rebuild switch --impure --flake .#orbstack
+# Meant to be applied from inside the VM: sudo nixos-rebuild switch --flake .#orbstack
 { lib, ... }:
 
 let
