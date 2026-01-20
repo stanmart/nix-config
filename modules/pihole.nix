@@ -136,12 +136,6 @@ in
   };
 
   config = {
-    # Avoid systemd-resolved binding to :53 (common conflict when you run a DNS server)
-    services.resolved.extraConfig = ''
-      DNSStubListener=no
-      MulticastDNS=off
-    '';
-
     services.pihole-ftl = {
       enable = true;
 
@@ -207,22 +201,6 @@ in
     services.pihole-web = {
       enable = true;
       ports = [ 8080 ];
-    };
-
-    # dnsmasq snippets (strictly explicit + optional policy rules)
-    #
-    # NOTE: if your nixpkgs exposes these under a different option path than
-    # services.pihole-ftl.dnsmasq, evaluation may fail. Paste the error and I’ll adjust.
-    services.pihole-ftl.dnsmasq = {
-      # Permit all origins (LAN + routed/VPN clients like Tailscale)
-      # We intentionally do NOT enable `local-service`
-      address = net.dnsmasq.address;
-      dhcpNameMatch = net.dnsmasq.dhcpNameMatch;
-
-      # DHCP option 6: tell clients which DNS server to use (this Pi-hole)
-      dhcpOption = optionals cfg.enableDhcp [
-        "6,${cfg.hostIp}"
-      ];
     };
 
     assertions = [

@@ -23,17 +23,6 @@
     fsType = "ext4";
   };
 
-
-  # your existing raspi settings...
-  system.stateVersion = "24.05";
-  boot.loader.grub.enable = false;
-  boot.loader.generic-extlinux-compatible.enable = true;
-
-  fileSystems."/" = {
-    device = "/dev/disk/by-label/NIXOS_SD";
-    fsType = "ext4";
-  };
-
   pihole = {
     interface = "eth0";
     enableDhcp = true;
@@ -43,4 +32,7 @@
   services.tailscale.extraUpFlags = [
     "--advertise-routes=true"
   ];
+
+  # The device will be its own DNS provider
+  services.resolved.enable = false;
 }
