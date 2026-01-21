@@ -8,17 +8,23 @@
   home.packages = with pkgs; [
     # Dev tools
     asciinema_3
-    tlrc
     cloc
+    micromamba
+    tlrc
 
     # Editors
     neovim
+
+    # QC-specific
+    awscli
+    jfrog-cli
 
     # Misc
     age
     cloudflared
     gnupg
     hcloud
+    pandoc
     sqlite
     typst
   ];
@@ -31,7 +37,7 @@
     };
   };
 
-  home.sessionPath = [
+  home.sessionPath = lib.mkBefore [
     "$HOME/.pixi/bin"
     "$HOME/.cargo/bin"
   ];

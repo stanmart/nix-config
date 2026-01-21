@@ -18,10 +18,11 @@
     # Misc
     cloc
     tlrc
+    git-filter-repo
   ];
 
   # PATH additions
-  home.sessionPath = [
+  home.sessionPath = lib.mkBefore [
     "$HOME/.pixi/bin"
     "$HOME/.cargo/bin"
   ];
