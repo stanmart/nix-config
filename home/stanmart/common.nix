@@ -19,7 +19,6 @@
     vim
     micro
     htop
-    tmux
     fastfetch
     wget
     gcc
@@ -56,6 +55,19 @@
       ls = "ls --color=auto";
       ll = "ls -lah";
     };
+  };
+
+  programs.tmux = {
+    enable = true;
+
+    clock24 = true;
+    keyMode = "vi";
+    historyLimit = 10000;
+
+    extraConfig = ''
+      set -g mouse on
+      set -g status-keys vi
+    '';
   };
 
   # Git configuration
