@@ -65,4 +65,7 @@
 
   # Homebrew packages (not auto-installed, run `brew bundle --file ~/Brewfile` manually)
   home.file."Brewfile".source = ./assets/Brewfile;
+
+  # Additional dotfiles
+  xdg.configFile."ghostty/config".source = ./assets/ghostty-config;
 }
