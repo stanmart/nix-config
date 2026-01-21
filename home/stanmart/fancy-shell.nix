@@ -66,6 +66,10 @@ in
         HYPHEN_INSENSITIVE="true"
         HIST_STAMPS="yyyy-mm-dd"
 
+        setopt autocd  # cd without writing 'cd'
+        setopt globdots # show dotfiles in autocomplete list
+
+
         # FZF settings
         export FZF_DEFAULT_COMMAND="fd --type f"
         export FZF_CTRL_T_COMMAND="fd --type f"
