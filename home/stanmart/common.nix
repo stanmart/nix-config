@@ -8,6 +8,8 @@
   home.homeDirectory = "/home/stanmart";
   home.stateVersion = "24.05";
 
+  xdg.enable = true;
+
   # Common packages
   home.packages = with pkgs; [
     # Shell / workflow
@@ -54,7 +56,8 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    
+    dotDir = config.home.homeDirectory;
+
     shellAliases = {
       cat = "bat -pp";
       ls = "ls --color=auto";
