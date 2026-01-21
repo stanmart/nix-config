@@ -1,0 +1,41 @@
+# Curated "things I actually want installed via Homebrew"
+# Run: brew bundle --file ~/Brewfile
+# Use with `--cleanup` to uninstall things not listed here
+
+# Taps
+# ----
+
+tap "owenthereal/upterm"
+
+# Casks (GUI apps + mac-native stuff)
+# -----------------------------------
+
+cask "1password-cli"        # let's manage this via brew for now
+cask "copilot-cli"          # GitHub Copilot CLI
+cask "devtoys"              # swiss army knife for developers
+cask "ghostty@tip"          # we can switch to the non-tip version when search gets released
+cask "iina"                 # video player
+cask "keybase"               # secure messaging + file sharing
+cask "linearmouse"          # for remapping mouse buttons
+cask "mactex-no-gui"        # LaTeX distribution without GUI apps
+cask "michaelvillar-timer"  # simple timer app
+cask "middleclick"          # this should be in macOS by default...
+cask "monitorcontrol"       # control monitor brightness/volume
+cask "netron"               # ONNX graph viewer
+cask "notion-calendar"      # best app for google calendar on macOS
+cask "notion"               # note-taking
+cask "notunes"              # prevent iTunes from auto-launching
+cask "orbstack"             # docker replacement for macOS
+cask "raycast"              # spotlight replacement
+cask "slidepilot"           # present pdfs with ease
+cask "tad"                  # parquet viewer
+cask "upscayl"              # AI image upscaler
+cask "upterm"               # terminal sharing
+
+# Formulae (prefer nix packages where possible)
+# ---------------------------------------------
+
+brew "jfrog-cli"  # for artifactory interactions (official installation method)
+
+
+

@@ -72,6 +72,9 @@
     extraConfig = ''
       set -g mouse on
       set -g status-keys vi
+      set -g default-terminal "tmux-256color"
+      set -as terminal-features ",xterm-ghostty:RGB"
+      set -as terminal-features ",tmux-256color:RGB"
     '';
   };
 

@@ -116,5 +116,5 @@ in
   };
 
   # Put your generated p10k config under HM control
-  home.file.".p10k.zsh".source = ./p10k.zsh;
+  home.file.".p10k.zsh".source = ./assets/p10k.zsh;
 }
