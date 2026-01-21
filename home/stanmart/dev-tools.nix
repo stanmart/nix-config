@@ -1,6 +1,6 @@
 # Some common toolchains for programming languages
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   home.packages = with pkgs; [
