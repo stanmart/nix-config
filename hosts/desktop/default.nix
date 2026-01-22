@@ -8,8 +8,15 @@
 {
 
   imports = [
-  ../../modules/onepassword.nix
+    ../../modules/onepassword.nix
+    ../../modules/auto-upgrade.nix
   ];
+
+  # Auto-upgrade from GitHub weekly (switch immediately, but no auto-reboot)
+  stanmart-auto-upgrade = {
+    flakeOutput = "desktop";
+    allowReboot = false;  # Desktop machine, don't interrupt user
+  };
 
   # System state version
   system.stateVersion = "24.05";

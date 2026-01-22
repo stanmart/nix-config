@@ -61,6 +61,35 @@ On the macOS machine:
 nix run home-manager -- switch --flake .#qc-macbook
 ```
 
+## Automatic Updates
+
+### NixOS Hosts
+
+NixOS hosts use `system.autoUpgrade` via the `modules/auto-upgrade.nix` module. Updates check weekly (Mondays at 4 AM with up to 1 hour randomized delay) from `github:stanmart/nix-config`.
+
+Configuration options per host:
+```nix
+stanmart-auto-upgrade = {
+  allowReboot = true;   # Auto-reboot if needed (servers)
+  operation = "switch"; # "switch" (immediate) or "boot" (next reboot)
+};
+```
+
+Current configuration:
+| Host | Auto Reboot | Operation |
+|------|-------------|-----------|
+| **raspi-pihole** | Yes | switch |
+| **hetzner-cloud** | Yes | switch |
+| **desktop** | No | switch |
+
+### macOS Home Manager (qc-macbook)
+
+macOS uses a launchd agent managed by home-manager (`home/stanmart/macos-auto-update.nix`). Updates run weekly on Mondays at 5 AM.
+
+No manual setup needed - `home-manager switch` installs and loads the agent automatically.
+
+**Logs:** `~/Library/Logs/nix-update.log` and `/tmp/nix-update-*.log`
+
 ## Deploying a New Hetzner VM
 
 1. **Create VM** with cloud-init:
