@@ -13,7 +13,14 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
+    ../../modules/auto-upgrade.nix
   ];
+
+  # Auto-upgrade from GitHub weekly
+  stanmart-auto-upgrade = {
+    flakeOutput = "hetzner-cloud";
+    allowReboot = true;  # Cloud server, safe to reboot
+  };
 
   # No password prompt for sudo
   security.sudo.wheelNeedsPassword = false;

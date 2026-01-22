@@ -8,7 +8,14 @@
 {
   imports = [
     ../../modules/pihole.nix
+    ../../modules/auto-upgrade.nix
   ];
+
+  # Auto-upgrade from GitHub weekly
+  stanmart-auto-upgrade = {
+    flakeOutput = "raspi-pihole";
+    allowReboot = true;  # Headless server, safe to reboot
+  };
 
   # System state version
   system.stateVersion = "24.05";

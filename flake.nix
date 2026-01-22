@@ -111,6 +111,7 @@
             ./home/stanmart/fancy-shell.nix
             ./home/stanmart/has-keys.nix
             ./home/stanmart/work.nix
+            ./home/stanmart/macos-auto-update.nix
           ];
         };
       };
