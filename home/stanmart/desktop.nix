@@ -14,7 +14,4 @@
     # Fonts
     meslo-lgs-nf
   ];
-
-  # Desktop-specific settings can go here
-  # For example: gtk themes, fonts, etc.
 }

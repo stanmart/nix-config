@@ -1,107 +1,74 @@
-# NixOS Flake-Based Multi-Host Architecture
+# NixOS Configuration Maintenance Guide
 
-This document describes the architectural principles and long-term design patterns for maintaining the NixOS repository as a flake-based, multi-host setup with clear system vs Home Manager separation.
+This document describes the conventions for maintaining this NixOS multi-host configuration repository.
 
----
+For repository structure and host descriptions, see [README.md](../README.md).
 
-## Executive Summary
+## Key Concepts
 
-The repository uses a flake-based, multi-host architecture supporting:
+### System vs Home Split
 
-- a Hetzner VM (server)
-- a Raspberry Pi (Pi-hole + containers)
-- a desktop (GUI, sometimes server-ish)
-- an OrbStack VM (local development on macOS)
+**System (NixOS modules):**
+- Boot, disks, hardware configuration
+- Networking, firewall rules
+- System services (SSH, Tailscale, fail2ban, Docker)
+- User accounts (but not dotfiles)
 
-This structure provides:
-
-- `flake.nix` as the entry point
-- `hosts/<host>/default.nix` for system configuration
-- `modules/*.nix` for shared system concerns
-- `home/<user>/*.nix` for Home Manager, split into common + host-specific overlays
-
-Secrets are explicitly out of scope for now.
-
-
----
-
-## Target Directory Structure
-
-```
-.
-├── flake.nix
-├── flake.lock
-│
-├── modules/
-│   ├── base.nix          # shared system defaults (users, nix, ssh, etc.)
-│   ├── server.nix        # optional later: server-specific knobs
-│   ├── desktop.nix       # optional later: GUI defaults
-│   └── containers.nix    # optional later: podman/docker patterns
-│
-├── hosts/
-│   ├── hetzner-cloud/
-│   │   ├── default.nix   # migrated from old configuration.nix
-│   │   └── disk-config.nix
-│   │
-│   ├── raspi-pihole/
-│   │   └── default.nix   # aarch64, podman + pihole (initially minimal)
-│   │
-│   ├── desktop/
-│   │   └── default.nix   # GUI machine, sometimes server-ish
-│   │
-│   └── orbstack/
-│       └── default.nix   # local dev VM on macOS
-│
-└── home/
-    └── stanmart/
-        ├── common.nix    # shared user environment
-        ├── hetzner.nix   # server-specific user tweaks
-        ├── raspi.nix     # minimal user env for Pi
-        ├── desktop.nix   # GUI apps, fonts, desktop tooling
-        └── orbstack.nix  # local dev environment
-```
-
----
-
-## Design Principles
-
-### 1. System vs Home Split
-
-**System (NixOS):**
-- bootloader, disks, hardware
-- networking, firewall
-- system services (ssh, tailscale, fail2ban, docker/podman)
-- users and groups (but not dotfiles or shells)
-
-**Home (Home Manager):**
-- shell config (zsh)
-- git config
-- editors, CLI tools
+**Home (Home Manager modules):**
+- Shell configuration (zsh, prompts, aliases)
+- Git, GPG, SSH client settings
+- Editors and CLI tools
 - GUI applications
-- per-user services
+- Per-user services (gpg-agent)
 
-This optimizes:
-- change velocity
-- blast radius
-- portability across machines
+### The mkHost Helper
 
-### 2. Same User, Different Hosts
+Most hosts use `mkHost` in `flake.nix` which automatically:
+1. Imports `modules/base.nix`
+2. Sets up Home Manager with `home/stanmart/common.nix`
+3. Allows additional modules via `modules` and `homeModules` parameters
 
-The same user (`stanmart`) gets different Home Manager overlays per host:
-- `common.nix` → everywhere
-- `desktop.nix` → GUI-heavy
-- `hetzner.nix` → server-lean
-- `raspi.nix` → pihole plus a couple of containers
+Exception: `orbstack` defines its config inline because it imports OrbStack's generated configs from `/etc/nixos/`.
 
-The flake wires this automatically based on host name.
+### Module Composition Pattern
 
----
+Prefer small, focused modules over conditionals:
+- `fancy-shell.nix` vs `simple-shell.nix` (not a single shell.nix with flags)
+- `has-keys.nix` only on machines with GPG/SSH keys set up
+- `desktop.nix` only on GUI machines
 
-## Long-term Maintenance Notes
+## Common Tasks
 
-- Keep changes incremental
-- Prefer composition over conditionals
-- Do not introduce secrets
-- This architecture favors clarity and maintainability over cleverness
+### Adding a Package
 
-For active development and step-by-step execution instructions, see the migration plan.
+**System-wide:** Add to `modules/base.nix` or `modules/minimal.nix`
+**User-level:** Add to `home/stanmart/common.nix` or a specific module
+**Host-specific:** Add to the host's `default.nix` or a host-specific home module
+
+### Adding a New Host
+
+1. Create `hosts/<hostname>/default.nix`
+2. Add to `nixosConfigurations` in `flake.nix` using `mkHost`
+3. Specify appropriate `homeModules` for the use case
+
+### Adding a New Home Module
+
+1. Create `home/stanmart/<feature>.nix`
+2. Add to relevant hosts' `homeModules` in `flake.nix`
+3. Keep modules focused on a single capability
+
+### Adding Static Config Files
+
+Place in `home/stanmart/assets/` and reference with:
+```nix
+home.file."<destination>".source = ./assets/<filename>;
+# or
+xdg.configFile."<app>/config".source = ./assets/<filename>;
+```
+
+## Conventions
+
+- **No secrets in the repo** - Use environment files or secret managers
+- **Composition over conditionals** - Multiple small modules, not complex conditionals
+- **Keep changes incremental** - Small, focused commits
+- **Test builds before deploy** - `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`

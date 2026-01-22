@@ -32,5 +32,5 @@
   users.mutableUsers = lib.mkDefault false;
   security.sudo.wheelNeedsPassword = lib.mkDefault false;
 
-  system.stateVersion = lib.mkDefault "26.05";
+  system.stateVersion = lib.mkDefault "24.05";
 }

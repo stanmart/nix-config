@@ -1,11 +1,11 @@
 # Common Home Manager configuration for stanmart user
 # Shared across all hosts
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # Home Manager needs this information
   home.username = "stanmart";
-  home.homeDirectory = "/home/stanmart";
+  home.homeDirectory = lib.mkDefault "/home/stanmart";
   home.stateVersion = "24.05";
 
   xdg.enable = true;
@@ -19,7 +19,6 @@
     fastfetch
     fd
     fzf
-    htop
     htop
     jq
     ripgrep

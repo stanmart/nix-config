@@ -2,7 +2,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  home.homeDirectory = lib.mkForce "/Users/stanmart";
+  home.homeDirectory = "/Users/stanmart";
 
   # Extra packages for work machine
   home.packages = with pkgs; [
