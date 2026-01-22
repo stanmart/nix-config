@@ -4,101 +4,124 @@
 
 Flake-based NixOS configuration supporting multiple hosts with clean system/user separation, plus standalone Home Manager for macOS.
 
+## Structure
+
+```
+├── flake.nix              # Entry point: defines all hosts and home configs
+├── modules/               # Shared system-level (NixOS) modules
+│   ├── base.nix           # Auto-imported for all hosts (users, SSH, Tailscale)
+│   ├── minimal.nix        # Minimal settings imported by base.nix
+│   └── ...                # Other opt-in modules (onepassword, pihole, etc.)
+├── hosts/                 # Per-host system configurations (one folder each)
+└── home/stanmart/         # Home Manager user configurations
+    ├── common.nix         # Auto-imported for all hosts (shell, git, SSH, GPG)
+    ├── ...                # Other opt-in modules (desktop, dev-tools, etc.)
+    └── assets/            # Static config files (p10k.zsh, Brewfile, etc.)
+```
+
 ## Hosts
 
 ### NixOS Systems
 
-- **hetzner-cloud** — x86_64 server (Hetzner VM)
-- **raspi-pihole** — aarch64 Raspberry Pi (Pi-hole + containers)
-- **desktop** — x86_64 desktop machine (GNOME)
-- **orbstack** — aarch64 local development VM (OrbStack on macOS)
+| Host | Architecture | Description |
+|------|--------------|-------------|
+| **desktop** | x86_64 | Primary desktop machine with GNOME, AMD graphics, Steam, PipeWire audio |
+| **raspi-pihole** | aarch64 | Raspberry Pi running Pi-hole for DNS/DHCP on home network |
+| **orbstack** | aarch64 | Local development VM running in OrbStack on macOS |
+| **hetzner-cloud** | x86_64 | Cloud server with Caddy reverse proxy and Docker |
 
 ### Home Manager Only
 
-- **qc-macbook** — aarch64 macOS work laptop (user environment only)
-
-## Quick Start
-
-### Deploy to Hetzner Cloud
-
-> [!TIP]
-> A Hetzner snapshot with NixOS pre-configured may already exist for this setup. Check your Hetzner Cloud console for available snapshots before manually deploying. Using a snapshot is faster and skips the initial deployment steps.
-
-1. **Create a VM** with cloud-init:
-```bash
-hcloud server create \
-  --user-data-from-file cloud-init.yaml \
-  --type cx23 \
-  --location hel1 \
-  --image ubuntu-24.04 \
-  --name my-server
-```
-
-2. **Deploy NixOS**:
-```bash
-nix run github:nix-community/nixos-anywhere -- \
-  --flake .#hetzner-cloud \
-  stanmart@<vm-ip>
-```
-
-3. **Post-deployment** (on the server):
-```bash
-# Set up Tailscale
-sudo tailscale up --auth-key=YOUR_KEY --ssh --advertise-exit-node
-
-# Clone this repo for future updates
-git clone https://github.com/stanmart/nix.git
-```
+| Host | Architecture | Description |
+|------|--------------|-------------|
+| **qc-macbook** | aarch64-darwin | Work laptop (macOS) - user environment only, no NixOS |
 
 ## Managing Systems
 
-### NixOS Systems
+### NixOS Hosts
 
-#### Local Rebuild (on the target machine)
+**Local rebuild** (on the target machine):
 ```bash
-sudo nixos-rebuild switch --flake .#hetzner-cloud
+sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
-#### Remote Rebuild (from your local machine)
+**Remote rebuild** (from another machine):
 ```bash
 nixos-rebuild switch \
-  --flake .#hetzner-cloud \
+  --flake .#<hostname> \
   --target-host stanmart@<ip> \
-  --sudo
-  --build-host stanmart@<ip>  # if different architecture
+  --build-host stanmart@<ip> \
+  --use-remote-sudo
 ```
 
 ### macOS Home Manager
 
 On the macOS machine:
 ```bash
-nix run home-manager switch --flake .#qc-macbook
+nix run home-manager -- switch --flake .#qc-macbook
 ```
 
-## Structure
+## Deploying a New Hetzner VM
 
+1. **Create VM** with cloud-init:
+```bash
+hcloud server create \
+  --user-data-from-file cloud-init.yaml \
+  --type cx22 \
+  --location hel1 \
+  --image ubuntu-24.04 \
+  --name my-server
 ```
-├── flake.nix              # Multi-host entry point
-├── modules/               # Shared system-level configurations
-│   └── base.nix           # Auto-imported for all hosts via mkHost
-│   └── ...                # Other capability modules (e.g., pihole)
-├── hosts/                 # Per-host system configurations
-└── home/stanmart/         # Home Manager user configurations
-    └── common.nix         # Auto-imported for all hosts via mkHost
-    └── ...                # Other capability modules (e.g., desktop)
+
+2. **Deploy NixOS** using nixos-anywhere:
+```bash
+nix run github:nix-community/nixos-anywhere -- \
+  --flake .#hetzner-cloud \
+  stanmart@<vm-ip>
 ```
 
-## What's Included
+3. **Post-deployment** setup (on the server):
+```bash
+sudo tailscale up --auth-key=YOUR_KEY --ssh --advertise-exit-node
+git clone https://github.com/stanmart/nix.git
+```
 
-### System Level (NixOS only)
-- **Base**: SSH, security (fail2ban), VPN (Tailscale), automatic cleanup
-- **Hetzner**: Reverse proxy (Caddy), containers (Docker)
-- **Desktop**: GUI (GNOME), graphics (AMD), gaming (Steam), audio (PipeWire)
-- **Raspberry Pi**: DNS/DHCP server (Pi-hole)
+> **Tip:** A Hetzner snapshot with NixOS pre-configured may already exist. Check your Hetzner Cloud console before manually deploying.
 
-### User Environment (all systems)
-- **Common**: Shell (zsh), version control (git), editors, CLI utilities
-- **Dev Tools**: Development tooling for coding projects
-- **Fancy Shell**: Enhanced shell experience with p10k theme
-- **Desktop**: GUI applications and desktop-specific tooling
-- **Work**: Work-specific configuration for macOS laptop
+## Architecture
+
+### System vs Home Split
+
+**System (NixOS)** handles:
+- Boot, disks, hardware
+- Networking, firewall
+- System services (SSH, Tailscale, fail2ban, Docker)
+- Users and groups
+
+**Home (Home Manager)** handles:
+- Shell configuration (zsh, prompt, aliases)
+- Git, GPG, SSH client config
+- Editors and CLI tools
+- GUI applications
+- Per-user services
+
+### Module Composition
+
+The `mkHost` helper in `flake.nix` automatically includes:
+- `modules/base.nix` for all hosts
+- `home/stanmart/common.nix` for the user
+
+Per-host modules are added via `modules` and `homeModules` parameters:
+```nix
+desktop = mkHost {
+  hostname = "desktop";
+  system = "x86_64-linux";
+  modules = [ ./hosts/desktop/default.nix ];
+  homeModules = [
+    ./home/stanmart/desktop.nix
+    ./home/stanmart/fancy-shell.nix
+    ./home/stanmart/has-keys.nix
+    ./home/stanmart/dev-tools.nix
+  ];
+};
+```

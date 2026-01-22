@@ -62,7 +62,7 @@ in
 
       # Rest of the config
       ''
-        # Your old OMZ settings
+        # Zsh settings
         HYPHEN_INSENSITIVE="true"
         HIST_STAMPS="yyyy-mm-dd"
 
