@@ -1,0 +1,12 @@
+[profile stanmart]
+sso_account_id = 398172284500
+sso_role_name = PowerUserAccess
+sso_region = eu-central-1
+output = json
+sso_start_url = https://quantco.awsapps.com/start
+sso_session = claude
+region = eu-central-1
+[sso-session claude]
+sso_start_url = https://quantco.awsapps.com/start
+sso_region = eu-central-1
+sso_registration_scopes = sso:account:access

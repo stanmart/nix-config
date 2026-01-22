@@ -16,7 +16,7 @@
     neovim
 
     # QC-specific
-    awscli
+    awscli2
     jfrog-cli
 
     # Misc
@@ -67,5 +67,7 @@
   home.file."Brewfile".source = ./assets/Brewfile;
 
   # Additional dotfiles
+  home.file.".claude/settings.json".source = ./assets/claude-settings;
+  home.file.".aws/config".source = ./assets/aws-config;
   xdg.configFile."ghostty/config".source = ./assets/ghostty-config;
 }
