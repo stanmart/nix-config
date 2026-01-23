@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "global.anthropic.claude-opus-4-5-20251101-v1:0",
+  "env": {
+    "CLAUDE_CODE_USE_BEDROCK": "1",
+    "AWS_CONFIG_FILE": "/Users/stanmart/.claude/aws.config",
+    "AWS_PROFILE": "stanmart",
+    "AWS_REGION": "eu-central-1"
+  }
+}
