@@ -62,6 +62,12 @@
       ls = "ls --color=auto";
       ll = "ls -lah";
     };
+
+    # Case-insensitive completion, treat dashes and underscores as equivalent
+    completionInit = ''
+      autoload -Uz compinit && compinit
+      zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}'
+    '';
   };
 
   programs.tmux = {
