@@ -53,8 +53,7 @@
   programs.zsh.shellAliases = {
     clip = "pbcopy";
     git-yk = "git -c user.signingkey='F008E648EEF97446!'";  # yubikey commit signing
-    claude-login = "AWS_PROFILE=stanmart AWS_REGION=eu-central-1 aws sts get-caller-identity > /dev/null || aws sso login";
-    claude-aws = "claude-login && claude";
+    claude-aws = "qc-claude-login && claude";
   };
 
   programs.zsh.initContent = lib.mkAfter ''
@@ -67,7 +66,7 @@
   home.file."Brewfile".source = ./assets/Brewfile;
 
   # Additional dotfiles
-  home.file.".claude/settings.json".source = ./assets/claude-settings;
-  home.file.".aws/config".source = ./assets/aws-config;
+  home.file.".claude/settings.json".source = ./assets/claude-settings.json;
+  home.file.".claude/aws.config".source = ./assets/aws-config;
   xdg.configFile."ghostty/config".source = ./assets/ghostty-config;
 }
