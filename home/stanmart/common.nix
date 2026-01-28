@@ -63,10 +63,31 @@
       ll = "ls -lah";
     };
 
-    # Case-insensitive completion, treat dashes and underscores as equivalent
+    initContent = lib.mkBefore ''
+        # Key binding
+        bindkey '^U' backward-kill-line
+
+        # Home/end
+        bindkey '^[[H' beginning-of-line
+        bindkey '^[[F' end-of-line
+
+        # Bind both common Up/Down escape sequences
+        bindkey '^[[A' up-line-or-beginning-search
+        bindkey '^[[B' down-line-or-beginning-search
+        bindkey '^[OA' up-line-or-beginning-search
+        bindkey '^[OB' down-line-or-beginning-search
+    '';
+
+    # Always case-insensitive, and treat - _ as equivalent, substring for files
     completionInit = ''
       autoload -Uz compinit && compinit
-      zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}'
+      _comp_options+=(globdots)
+
+      zstyle ':completion:*' matcher-list \
+        'm:{a-zA-Z}={A-Za-z}' \
+        'm:{-_}={_-}' \
+        'm:{-.}={.-}' \
+        'm:{_.}={._}'
     '';
   };
 
