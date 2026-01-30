@@ -1,39 +1,20 @@
-# NixOS configuration for Hetzner cloud VM
-# Deploy with: nixos-anywhere --flake .#hetzner-cloud stanmart@<ip>
-# Manage with: nixos-rebuild switch --flake .#hetzner-cloud
-{
-  modulesPath,
-  lib,
-  config,
-  pkgs,
-  ...
-}:
+# Shared configuration for cloud VMs (Hetzner, AWS, etc.)
+# Deploy with: nixos-anywhere --flake .#<hostname> root@<ip>
+{ modulesPath, lib, pkgs, ... }:
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
-    (modulesPath + "/profiles/qemu-guest.nix")
-    ./disk-config.nix
-    ../../modules/auto-upgrade.nix
   ];
-
-  # Auto-upgrade from GitHub weekly
-  stanmart-auto-upgrade = {
-    flakeOutput = "hetzner-cloud";
-    allowReboot = true;  # Cloud server, safe to reboot
-  };
 
   # No password prompt for sudo
   security.sudo.wheelNeedsPassword = false;
 
-  # Boot loader configuration for GRUB with EFI
+  # Boot loader - UEFI with GRUB
   boot.loader.grub = {
-    # disko will add all devices that have a EF02 partition
     efiSupport = true;
     efiInstallAsRemovable = true;
+    device = "nodev";
   };
-
-  # System state version - don't change this after initial install
-  system.stateVersion = "24.05";
 
   # Caddy reverse proxy
   services.caddy = {
@@ -41,17 +22,16 @@
     configFile = pkgs.writeText "Caddyfile" ''
       # Caddy configuration file
       # Reload with: sudo systemctl reload caddy
-      
-      # Uncomment and modify the block below:
+
       # Subdomain-based routing example:
       # app1.example.com {
       #     reverse_proxy localhost:8080
       # }
-      # 
+      #
       # app2.example.com {
       #     reverse_proxy localhost:3000
       # }
-      
+
       # Path-based routing example:
       # example.com {
       #     reverse_proxy /api/* localhost:8080
