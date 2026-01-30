@@ -37,12 +37,25 @@
 
       nixosConfigurations = {
         # Hetzner cloud server (x86_64)
-        hetzner-cloud = mkHost {
-          hostname = "hetzner-cloud";
+        hetzner = mkHost {
+          hostname = "hetzner";
           system = "x86_64-linux";
           modules = [
             disko.nixosModules.disko
-            ./hosts/hetzner-cloud/default.nix
+            ./hosts/hetzner
+          ];
+          homeModules = [
+            ./home/stanmart/simple-shell.nix
+          ];
+        };
+
+        # AWS EC2 instance (x86_64)
+        aws = mkHost {
+          hostname = "aws";
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/aws
           ];
           homeModules = [
             ./home/stanmart/simple-shell.nix
@@ -54,7 +67,7 @@
           hostname = "raspi-pihole";
           system = "aarch64-linux";
           modules = [
-            ./hosts/raspi-pihole/default.nix
+            ./hosts/raspi-pihole
           ];
           homeModules = [
             ./home/stanmart/fancy-shell.nix
@@ -67,7 +80,7 @@
           hostname = "desktop";
           system = "x86_64-linux";
           modules = [
-            ./hosts/desktop/default.nix
+            ./hosts/desktop
           ];
           homeModules = [
             ./home/stanmart/desktop.nix
@@ -83,8 +96,8 @@
           system = "aarch64-linux";
           specialArgs = { inherit self; };
           modules = [
-            ./hosts/orbstack/default.nix
-            
+            ./hosts/orbstack
+
             # Home Manager
             home-manager.nixosModules.home-manager
             {

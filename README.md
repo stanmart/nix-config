@@ -28,7 +28,8 @@ Flake-based NixOS configuration supporting multiple hosts with clean system/user
 | **desktop** | x86_64 | Primary desktop machine with GNOME, AMD graphics, Steam, PipeWire audio |
 | **raspi-pihole** | aarch64 | Raspberry Pi running Pi-hole for DNS/DHCP on home network |
 | **orbstack** | aarch64 | Local development VM running in OrbStack on macOS |
-| **hetzner-cloud** | x86_64 | Cloud server with Caddy reverse proxy and Docker |
+| **hetzner** | x86_64 | Hetzner cloud server with Caddy reverse proxy and Docker |
+| **aws** | x86_64 | AWS EC2 instance with Caddy reverse proxy and Docker |
 
 ### Home Manager Only
 
@@ -79,7 +80,8 @@ Current configuration:
 | Host | Auto Reboot | Operation |
 |------|-------------|-----------|
 | **raspi-pihole** | Yes | switch |
-| **hetzner-cloud** | Yes | switch |
+| **hetzner** | Yes | switch |
+| **aws** | Yes | switch |
 | **desktop** | No | switch |
 
 ### macOS Home Manager (qc-macbook)
@@ -90,32 +92,38 @@ No manual setup needed - `home-manager switch` installs and loads the agent auto
 
 **Logs:** `~/Library/Logs/nix-update.log` and `/tmp/nix-update-*.log`
 
-## Deploying a New Hetzner VM
+## Deploying Cloud VMs
 
-1. **Create VM** with cloud-init:
+Both Hetzner and AWS configs use `nixos-anywhere` to deploy NixOS from any base Linux image.
+
+### Hetzner
+
 ```bash
+# Create VM (any Linux image works)
 hcloud server create \
-  --user-data-from-file cloud-init.yaml \
   --type cx22 \
   --location hel1 \
   --image ubuntu-24.04 \
   --name my-server
+
+# Deploy NixOS
+nixos-anywhere --flake .#hetzner root@<ip>
 ```
 
-2. **Deploy NixOS** using nixos-anywhere:
+### AWS EC2
+
 ```bash
-nix run github:nix-community/nixos-anywhere -- \
-  --flake .#hetzner-cloud \
-  stanmart@<vm-ip>
+# Launch instance (any Linux AMI works), then deploy:
+nixos-anywhere --flake .#aws root@<ip>
 ```
 
-3. **Post-deployment** setup (on the server):
+**Note:** Use Nitro-based instance types (T3, M5, M6, C5, C6, R5, R6, etc.). Older Xen instances (T2, M4) are not supported.
+
+### Post-deployment (both providers)
+
 ```bash
 sudo tailscale up --auth-key=YOUR_KEY --ssh --advertise-exit-node
-git clone https://github.com/stanmart/nix.git
 ```
-
-> **Tip:** A Hetzner snapshot with NixOS pre-configured may already exist. Check your Hetzner Cloud console before manually deploying.
 
 ## Architecture
 
@@ -145,7 +153,7 @@ Per-host modules are added via `modules` and `homeModules` parameters:
 desktop = mkHost {
   hostname = "desktop";
   system = "x86_64-linux";
-  modules = [ ./hosts/desktop/default.nix ];
+  modules = [ ./hosts/desktop ];
   homeModules = [
     ./home/stanmart/desktop.nix
     ./home/stanmart/fancy-shell.nix

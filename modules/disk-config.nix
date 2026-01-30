@@ -1,5 +1,5 @@
-# Disko disk configuration for automated partitioning
-# This will create a BIOS-compatible GPT partition with LVM
+# Shared disko disk configuration for cloud VMs (hybrid BIOS/UEFI)
+# Override disko.devices.disk.disk1.device per-host if needed (default: /dev/sda)
 { lib, ... }:
 {
   disko.devices = {
@@ -12,12 +12,12 @@
           boot = {
             name = "boot";
             size = "1M";
-            type = "EF02";
+            type = "EF02";  # BIOS boot partition
           };
           esp = {
             name = "ESP";
-            size = "500M";
-            type = "EF00";
+            size = "512M";
+            type = "EF00";  # EFI System Partition
             content = {
               type = "filesystem";
               format = "vfat";
@@ -45,9 +45,7 @@
               type = "filesystem";
               format = "ext4";
               mountpoint = "/";
-              mountOptions = [
-                "defaults"
-              ];
+              mountOptions = [ "defaults" ];
             };
           };
         };
