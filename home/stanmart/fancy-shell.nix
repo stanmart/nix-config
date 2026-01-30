@@ -82,11 +82,6 @@ in
         zstyle ':completion:*' menu no
         zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 
-        # Ensure prefix history search widgets exist
-        autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
-        zle -N up-line-or-beginning-search
-        zle -N down-line-or-beginning-search
-
         # p10k config managed by HM
         [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
