@@ -35,7 +35,7 @@ cask "upterm"               # terminal sharing
 # Formulae (prefer nix packages where possible)
 # ---------------------------------------------
 
-# brew "some-package"
+brew "opencode"             # Open-source coding agent
 
 
 
