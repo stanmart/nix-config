@@ -11,11 +11,12 @@ tap "owenthereal/upterm"
 # -----------------------------------
 
 cask "1password-cli"        # let's manage this via brew for now
+cask "codex-app"            # OpenAI coding harness
 cask "copilot-cli"          # GitHub Copilot CLI
 cask "devtoys"              # swiss army knife for developers
 cask "ghostty@tip"          # we can switch to the non-tip version when search gets released
 cask "iina"                 # video player
-cask "keybase"               # secure messaging + file sharing
+cask "keybase"              # secure messaging + file sharing
 cask "linearmouse"          # for remapping mouse buttons
 cask "mactex-no-gui"        # LaTeX distribution without GUI apps
 cask "michaelvillar-timer"  # simple timer app
