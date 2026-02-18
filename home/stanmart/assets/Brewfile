@@ -36,7 +36,9 @@ cask "upterm"               # terminal sharing
 # Formulae (prefer nix packages where possible)
 # ---------------------------------------------
 
+brew "npm"                  # package manager for JavaScript
 brew "opencode"             # Open-source coding agent
+brew "yarn"                 # another package manager for JavaScript
 
 
 
