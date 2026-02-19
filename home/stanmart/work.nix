@@ -69,4 +69,5 @@
   home.file.".claude/settings.json".source = ./assets/claude-settings.json;
   home.file.".claude/aws.config".source = ./assets/aws-config;
   xdg.configFile."ghostty/config".source = ./assets/ghostty-config;
+  xdg.configFile."upterm/config.yaml".source = ./assets/upterm-config.yaml;
 }
