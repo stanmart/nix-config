@@ -37,7 +37,7 @@ cask "wispr-flow"           # fancy dictation app
 # Formulae (prefer nix packages where possible)
 # ---------------------------------------------
 
-brew ffmpeg                 # for video processing
+brew "ffmpeg"                 # for video processing
 brew "npm"                  # package manager for JavaScript
 brew "opencode"             # Open-source coding agent
 brew "yarn"                 # another package manager for JavaScript
