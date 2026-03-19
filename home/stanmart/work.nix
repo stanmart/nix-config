@@ -63,8 +63,12 @@
     fi
   '';
 
-  # Homebrew packages (not auto-installed, run `brew bundle --file ~/Brewfile` manually)
+  # Homebrew packages (auto-synced on every home-manager switch)
   home.file."Brewfile".source = ./assets/Brewfile;
+
+  home.activation.brewBundle = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    /opt/homebrew/bin/brew bundle --file ~/Brewfile --cleanup
+  '';
 
   # Additional dotfiles
   home.file.".claude/settings.json".source = ./assets/claude-settings.json;
