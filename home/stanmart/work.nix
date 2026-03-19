@@ -21,6 +21,7 @@
 
     # Misc
     age
+    btop
     cloudflared
     gnupg
     hcloud

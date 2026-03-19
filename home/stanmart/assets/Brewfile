@@ -32,6 +32,7 @@ cask "slidepilot"           # present pdfs with ease
 cask "tad"                  # parquet viewer
 cask "upscayl"              # AI image upscaler
 cask "upterm"               # terminal sharing
+cask "wispr-flow"           # fancy dictation app
 
 # Formulae (prefer nix packages where possible)
 # ---------------------------------------------
