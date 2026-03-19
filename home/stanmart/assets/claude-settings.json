@@ -24,7 +24,8 @@
 	    "allowWrite": ["//tmp/claude"]
     },
     "excludedCommands": [
-      "git *"
+      "git *",
+      "gh *"
     ]
   },
   "permissions": {
@@ -49,6 +50,15 @@
       "Bash(git cherry-pick*)",
       "Bash(pixi lock)",
       "Bash(pixi install*)",
+      "Bash(gh pr view*)",
+      "Bash(gh pr list*)",
+      "Bash(gh pr diff*)",
+      "Bash(gh pr checks*)",
+      "Bash(gh pr status*)",
+      "Bash(gh pr reviews*)",
+      "Bash(gh issue view*)",
+      "Bash(gh issue list*)",
+      "Bash(gh issue status*)",
       "mcp__ide__getDiagnostics"
     ]
   }
