@@ -21,7 +21,7 @@
       ]
     },
     "filesystem": {
-	    "allowWrite": ["//tmp/claude"]
+	    "allowWrite": ["//tmp/claude/**"]
     },
     "excludedCommands": [
       "git *",
