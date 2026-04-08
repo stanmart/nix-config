@@ -33,6 +33,7 @@ cask "tad"                  # parquet viewer
 cask "upscayl"              # AI image upscaler
 cask "upterm"               # terminal sharing
 cask "wispr-flow"           # fancy dictation app
+cask "zed"                  # modern lightweight code editor
 
 # Formulae (prefer nix packages where possible)
 # ---------------------------------------------
