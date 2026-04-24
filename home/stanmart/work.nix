@@ -49,6 +49,10 @@
   home.sessionVariables = {
     SCIKIT_LEARN_DATA = "~/.datasets/scikit-learn";
     LIBSVMDATA_HOME = "~/.datasets/libsvm";
+    CLAUDE_CODE_USE_BEDROCK = "1";
+    AWS_CONFIG_FILE = "/Users/stanmart/.claude/aws.config";
+    AWS_PROFILE = "stanmart";
+    AWS_REGION = "eu-central-1";
   };
 
   programs.zsh.shellAliases = {
@@ -70,8 +74,20 @@
     /opt/homebrew/bin/brew bundle --file ~/Brewfile --cleanup
   '';
 
+  # ~/.claude/settings.json is not a symlink so the Claude Code UI can write to it
+  # (model selection, etc.), but we merge our managed keys (awsAuthRefresh, sandbox,
+  # permissions) into it on every activation.
+  home.activation.claudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    settings="$HOME/.claude/settings.json"
+    $DRY_RUN_CMD mkdir -p "$HOME/.claude"
+    [ -f "$settings" ] || $DRY_RUN_CMD ${pkgs.coreutils}/bin/tee "$settings" <<<'{}' >/dev/null
+    $DRY_RUN_CMD ${pkgs.jq}/bin/jq -s '.[0] + .[1]' \
+      "$settings" ${./assets/claude-settings-managed.json} \
+      > "$settings.tmp"
+    $DRY_RUN_CMD mv "$settings.tmp" "$settings"
+  '';
+
   # Additional dotfiles
-  home.file.".claude/settings.json".source = ./assets/claude-settings.json;
   home.file.".claude/aws.config".source = ./assets/aws-config;
   xdg.configFile."ghostty/config".source = ./assets/ghostty-config;
   xdg.configFile."upterm/config.yaml".source = ./assets/upterm-config.yaml;
