@@ -14,7 +14,7 @@ cask "1password-cli"        # let's manage this via brew for now
 cask "codex-app"            # OpenAI coding harness
 cask "copilot-cli"          # GitHub Copilot CLI
 cask "devtoys"              # swiss army knife for developers
-cask "ghostty@tip"          # we can switch to the non-tip version when search gets released
+cask "ghostty"              # terminal emulator
 cask "iina"                 # video player
 cask "keybase"              # secure messaging + file sharing
 cask "linearmouse"          # for remapping mouse buttons
