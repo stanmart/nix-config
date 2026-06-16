@@ -7,7 +7,7 @@
   # Extra packages for work machine
   home.packages = with pkgs; [
     # Dev tools
-    asciinema_3
+    asciinema
     cloc
     micromamba
     tlrc

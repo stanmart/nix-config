@@ -2,11 +2,6 @@
 # Run: brew bundle --file ~/Brewfile
 # Use with `--cleanup` to uninstall things not listed here
 
-# Taps
-# ----
-
-tap "owenthereal/upterm"
-
 # Casks (GUI apps + mac-native stuff)
 # -----------------------------------
 
@@ -31,7 +26,7 @@ cask "raycast"              # spotlight replacement
 cask "slidepilot"           # present pdfs with ease
 cask "tad"                  # parquet viewer
 cask "upscayl"              # AI image upscaler
-cask "upterm"               # terminal sharing
+cask "owenthereal/upterm/upterm"   # terminal sharing
 cask "wispr-flow"           # fancy dictation app
 cask "zed"                  # modern lightweight code editor
 
