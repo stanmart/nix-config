@@ -38,9 +38,10 @@ cask "zed"                  # modern lightweight code editor
 # Formulae (prefer nix packages where possible)
 # ---------------------------------------------
 
-brew "ffmpeg"                 # for video processing
+brew "ffmpeg"               # for video processing
 brew "npm"                  # package manager for JavaScript
 brew "opencode"             # Open-source coding agent
+brew "pandoc"               # universal document converter
 brew "yarn"                 # another package manager for JavaScript
 
 
