@@ -25,7 +25,6 @@
     cloudflared
     gnupg
     hcloud
-    pandoc
     sqlite
     typst
 
