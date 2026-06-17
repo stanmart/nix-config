@@ -17,6 +17,7 @@
 
     # Misc
     cloc
+    tokei
     tlrc
     git-filter-repo
   ];
