@@ -11,6 +11,7 @@
     cloc
     micromamba
     tlrc
+    tokei
 
     # Editors
     neovim
