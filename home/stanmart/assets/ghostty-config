@@ -71,7 +71,7 @@ font-family = "MesloLGS NF"
 font-size = 14.5
 cursor-style = bar
 
-keybind = global:cmd+ctrl+backquote=toggle_quick_terminal
+keybind = global:cmd+ctrl+t=toggle_quick_terminal
 quick-terminal-autohide=true
 quick-terminal-size = 33%
 
