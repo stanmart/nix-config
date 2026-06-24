@@ -6,6 +6,7 @@
 # -----------------------------------
 
 cask "1password-cli"        # let's manage this via brew for now
+cask "antinote"             # simple disposable notes
 cask "codex-app"            # OpenAI coding harness
 cask "copilot-cli"          # GitHub Copilot CLI
 cask "devtoys"              # swiss army knife for developers
@@ -21,6 +22,7 @@ cask "netron"               # ONNX graph viewer
 cask "notion-calendar"      # best app for google calendar on macOS
 cask "notion"               # note-taking
 cask "notunes"              # prevent iTunes from auto-launching
+cask "obsidian"             # knowledge management
 cask "orbstack"             # docker replacement for macOS
 cask "raycast"              # spotlight replacement
 cask "slidepilot"           # present pdfs with ease
