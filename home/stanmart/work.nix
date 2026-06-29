@@ -24,6 +24,7 @@
     age
     btop
     cloudflared
+    glow
     gnupg
     hcloud
     sqlite

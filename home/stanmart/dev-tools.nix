@@ -17,6 +17,7 @@
 
     # Misc
     cloc
+    glow
     tokei
     tlrc
     git-filter-repo
