@@ -26,6 +26,7 @@
     cloudflared
     glow
     gnupg
+    graphviz
     hcloud
     sqlite
     typst
