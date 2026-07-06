@@ -33,6 +33,7 @@
     micro
 
     # Networking
+    dig
     iperf3
     nmap
     rclone
