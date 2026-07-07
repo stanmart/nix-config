@@ -161,41 +161,32 @@
     enable = true;  # ensures ~/.ssh exists with sane perms
     enableDefaultConfig = false;  # we set our own defaults
 
-    # Top-of-file raw additions — safe when missing and simple
-    extraConfig = ''
-      # Allow optional per-host overrides dropped by OrbStack (ignored if missing)
-      Include ~/.orbstack/ssh/config
-    '';
+    # Allow optional per-host overrides dropped by OrbStack (ignored if missing)
+    includes = [ "~/.orbstack/ssh/config" ];
 
-    # Structured host blocks (clean, declarative)
-    matchBlocks = {
+    # Host blocks, using upstream OpenSSH directive names
+    settings = {
       # Global defaults
       "*" = {
-        extraOptions = {
-          SetEnv = "TERM=xterm-256color";
-        };
+        SetEnv.TERM = "xterm-256color";
       };
 
       csiganas = {
-        user = "martin";
+        User = "martin";
       };
 
       router = {
-        hostname = "192.168.8.1";
-        user = "admin";
-        extraOptions = {
-          HostkeyAlgorithms = "+ssh-rsa";
-        };
+        HostName = "192.168.8.1";
+        User = "admin";
+        HostkeyAlgorithms = "+ssh-rsa";
       };
 
       "tiny-vm.akita-chicken.ts.net tiny-vm" = {
-        hostname = "tiny-vm.akita-chicken.ts.net";
-        user = "stanmart";
-        extraOptions = {
-          StrictHostKeyChecking = "no";
-          UserKnownHostsFile = "/dev/null";
-          GlobalKnownHostsFile = "/dev/null";
-        };
+        HostName = "tiny-vm.akita-chicken.ts.net";
+        User = "stanmart";
+        StrictHostKeyChecking = "no";
+        UserKnownHostsFile = "/dev/null";
+        GlobalKnownHostsFile = "/dev/null";
       };
     };
   };
