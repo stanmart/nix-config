@@ -46,6 +46,7 @@
   home.sessionPath = lib.mkBefore [
     "$HOME/.pixi/bin"
     "$HOME/.cargo/bin"
+    "$HOME/.local/bin"
   ];
 
   home.sessionVariables = {
@@ -63,6 +64,20 @@
     claude-aws = "qc-claude-login && claude";
   };
 
+  # Keep PATH entries unique in every zsh (nested login shells, e.g. tmux
+  # panes, re-run .zprofile and would otherwise accumulate duplicates)
+  programs.zsh.envExtra = ''
+    typeset -U path PATH
+  '';
+
+  # Contents of the previously unmanaged ~/.zprofile
+  programs.zsh.profileExtra = ''
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+
+    # OrbStack command-line tools and integration
+    source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+  '';
+
   programs.zsh.initContent = lib.mkAfter ''
     if [ -f ~/.config/secrets/env ]; then
       source ~/.config/secrets/env
@@ -74,7 +89,7 @@
 
   home.activation.brewBundle = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
     /opt/homebrew/bin/brew trust --cask owenthereal/upterm/upterm
-    /opt/homebrew/bin/brew bundle --file ~/Brewfile --cleanup
+    /opt/homebrew/bin/brew bundle --file ~/Brewfile --cleanup --force
   '';
 
   # ~/.claude/settings.json is not a symlink so the Claude Code UI can write to it
