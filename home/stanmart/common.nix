@@ -34,6 +34,7 @@
 
     # Networking
     dig
+    doggo
     iperf3
     nmap
     rclone
