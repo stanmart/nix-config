@@ -52,7 +52,7 @@
   home.sessionVariables = {
     SCIKIT_LEARN_DATA = "~/.datasets/scikit-learn";
     LIBSVMDATA_HOME = "~/.datasets/libsvm";
-    CLAUDE_CODE_USE_BEDROCK = "1";
+    # CLAUDE_CODE_USE_BEDROCK = "1";
     AWS_CONFIG_FILE = "/Users/stanmart/.claude/aws.config";
     AWS_PROFILE = "stanmart";
     AWS_REGION = "eu-central-1";
