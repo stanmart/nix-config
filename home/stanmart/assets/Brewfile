@@ -10,6 +10,7 @@ cask "antinote"             # simple disposable notes
 cask "copilot-cli"          # GitHub Copilot CLI
 cask "devtoys"              # swiss army knife for developers
 cask "ghostty"              # terminal emulator
+cask "handy"                # voice to text
 cask "iina"                 # video player
 cask "keybase"              # secure messaging + file sharing
 cask "linearmouse"          # for remapping mouse buttons
@@ -37,6 +38,7 @@ brew "ffmpeg"               # for video processing
 brew "npm"                  # package manager for JavaScript
 brew "opencode"             # Open-source coding agent
 brew "pandoc"               # universal document converter
+brew "pi-coding-agent"      # Another open-source coding agent
 brew "yarn"                 # another package manager for JavaScript
 
 
