@@ -1,6 +1,5 @@
 # Curated "things I actually want installed via Homebrew"
 # Run: brew bundle --file ~/Brewfile
-# Use with `--cleanup` to uninstall things not listed here
 
 # Casks (GUI apps + mac-native stuff)
 # -----------------------------------
