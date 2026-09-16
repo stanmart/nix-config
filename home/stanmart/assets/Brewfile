@@ -35,6 +35,7 @@ cask "zed"                  # modern lightweight code editor
 # ---------------------------------------------
 
 brew "ffmpeg"               # for video processing
+brew "nono"                 # sandbox for AI agents
 brew "npm"                  # package manager for JavaScript
 brew "opencode"             # Open-source coding agent
 brew "pandoc"               # universal document converter
