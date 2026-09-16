@@ -89,7 +89,7 @@
 
   home.activation.brewBundle = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
     /opt/homebrew/bin/brew trust --cask owenthereal/upterm/upterm
-    /opt/homebrew/bin/brew bundle --file ~/Brewfile --cleanup --force
+    /opt/homebrew/bin/brew bundle --file ~/Brewfile --force
   '';
 
   # ~/.claude/settings.json is not a symlink so the Claude Code UI can write to it
