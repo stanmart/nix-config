@@ -62,6 +62,20 @@
           ];
         };
 
+        # Smart-home host: Home Assistant stack on the Lenovo M75n (x86_64)
+        homeassistant = mkHost {
+          hostname = "homeassistant";
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/homeassistant
+          ];
+          homeModules = [
+            ./home/stanmart/simple-shell.nix
+            ./home/stanmart/dev-tools.nix
+          ];
+        };
+
         # Raspberry Pi with Pi-hole (aarch64)
         raspi-pihole = mkHost {
           hostname = "raspi-pihole";
