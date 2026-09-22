@@ -51,6 +51,14 @@
       "--advertise-exit-node"
       "--accept-routes"
     ];
+    # Required for the two flags above to do anything. The flags are only a request
+    # to the control plane; the kernel side has to be set up separately:
+    #   "server" enables IP forwarding, without which an advertised exit node cannot
+    #            actually route a packet;
+    #   "client" loosens reverse path filtering, without which return traffic over an
+    #            accepted subnet route can be dropped silently.
+    # The default is "none", so both flags above were previously inert.
+    useRoutingFeatures = "both";
   };
 
   # Firewall configuration
