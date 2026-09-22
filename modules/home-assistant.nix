@@ -90,6 +90,16 @@ let
   '';
 
   # Seeded once into /var/lib/homeassistant, then owned by Home Assistant.
+  #
+  # NOTE: seeding the http block is necessary but NOT sufficient. Home Assistant
+  # treats a changed http config as *pending* and reverts it unless someone confirms
+  # it by loading the web UI within five minutes of startup -- a guard against
+  # locking yourself out with a bad proxy setting. On an unattended first boot nobody
+  # confirms, so it silently reverts and every proxied request then fails with
+  # "400: Bad Request" and "not set-up for reverse proxies" in the log.
+  #
+  # There is no way to pre-confirm this from Nix: the stable/pending marker lives in
+  # Home Assistant's own .storage. Load the UI shortly after first start.
   haConfigSeed = pkgs.writeText "configuration.yaml" ''
     # Seeded by NixOS on first boot (modules/home-assistant.nix).
     # Home Assistant owns this file from here on -- edit it in place, not in the repo.
