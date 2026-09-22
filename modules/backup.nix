@@ -90,7 +90,7 @@ in
         ExecStart = pkgs.writeShellScript "backup" ''
           set -euo pipefail
 
-          archive=${lib.escapeShellArg "${cfg.subdir}.tar.gz"}
+          archive=${lib.escapeShellArg "${cfg.subdir}.tar"}
           mnt=$(${pkgs.coreutils}/bin/mktemp -d)
 
           # The share is mounted only for the duration of the run: nothing is left
@@ -129,8 +129,14 @@ in
           # Write beside the live archive and rename, so a run that dies partway
           # cannot leave a truncated file where the only good copy used to be.
           set +e
+          # Deliberately uncompressed. A flipped bit in a gzip stream destroys
+          # everything after it, while damage to a plain tar costs one file and leaves
+          # the rest extractable -- which matters for an archive whose reason to exist
+          # is the Zigbee network key. It is also redundant work: the NAS compresses on
+          # the way offsite, and can compress this at rest if the share has btrfs
+          # compression on. At a few MB the space saved was never the point.
           ${pkgs.gnutar}/bin/tar \
-            --create --gzip \
+            --create \
             --file "$mnt/${cfg.subdir}/$archive.tmp" \
             --directory / \
             ${lib.concatMapStringsSep " " (p: "--exclude=${lib.escapeShellArg p}") cfg.excludes} \
