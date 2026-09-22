@@ -27,6 +27,7 @@ Flake-based NixOS configuration supporting multiple hosts with clean system/user
 |------|--------------|-------------|
 | **desktop** | x86_64 | Primary desktop machine with GNOME, AMD graphics, Steam, PipeWire audio |
 | **raspi-pihole** | aarch64 | Raspberry Pi running Pi-hole for DNS/DHCP on home network |
+| **homeassistant** | x86_64 | Lenovo M75n running the smart-home stack (Home Assistant, Mosquitto, Zigbee2MQTT, Node-RED, Matter hub) as pinned Docker containers |
 | **orbstack** | aarch64 | Local development VM running in OrbStack on macOS |
 | **hetzner** | x86_64 | Hetzner cloud server with Caddy reverse proxy and Docker |
 | **aws** | x86_64 | AWS EC2 instance with Caddy reverse proxy and Docker |
