@@ -31,7 +31,7 @@ in
   # offsite -- so this only has to move bytes, not manage retention.
   stanmart-backup = {
     enable = true;
-    target = "backup@192.168.8.150:/volume1/martin/backup/homeassistant";
+    target = "backup@192.168.8.150:/volume1/backup-external/homeassistant";
     paths = [
       # The Zigbee network key lives here. Lose it and every paired device has to be
       # re-paired by hand -- this is the directory the whole exercise is for.
