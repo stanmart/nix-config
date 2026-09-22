@@ -59,6 +59,8 @@ let
     # Split DNS: explicit records only
     # Format per your earlier example: "alias,target"
     cnameRecords = [
+      # Fronted by nginx on the homeassistant host, which dispatches on the name.
+      # Only the .eu forms carry a valid certificate; the short forms redirect to them.
       "nginx.raspi,raspi"
     ];
 
