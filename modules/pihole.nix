@@ -64,7 +64,6 @@ let
 
     # A records
     aRecords = [
-      # Statically configured on the host itself (below the DHCP pool), not a lease.
     ];
   };
 
@@ -135,8 +134,14 @@ in
           router = net.routerIp;
           ipv6 = net.dhcp.ipv6;
 
-          # Static DHCP leases
-          hosts = [ ];
+          # Static DHCP leases, as "MAC,IP,hostname".
+          #
+          # These already exist in the bare-metal Pi-hole currently running on raspi.
+          # Mirrored here so they are not silently lost the day that host is switched
+          # over to this flake -- an empty list would hand these addresses back to the
+          # pool and move the machines.
+          hosts = [
+          ];
 
           # Don’t try to do IPv6 resolution via DHCP path
           resolver.resolveIPv6 = false;
