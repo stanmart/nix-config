@@ -69,6 +69,19 @@ in
   # systemd-networkd rather than the scripted backend, for route metrics: the box is
   # dual-homed on one subnet and "which IP is it on today" must not be ambiguous for the
   # host that owns a DNS record.
+  # Advertise the LAN over the tailnet. base.nix already advertises this host as an
+  # exit node; the subnet route is the half it does not cover.
+  #
+  # Deliberately overlapping with raspi rather than waiting for it to retire: Tailscale
+  # accepts several routers for the same CIDR, elects one as primary and fails over to
+  # the other, so running both is redundancy now and a no-op handover later. The
+  # Rebuild Plan flags losing this role as something that breaks remote access to the
+  # NAS silently, and the way to not have that happen is to not have a handover day.
+  #
+  # Inert until the route is approved in the admin console -- separately from the exit
+  # node, and separately per machine.
+  services.tailscale.extraUpFlags = [ "--advertise-routes=192.168.8.0/24" ];
+
   networking.useDHCP = false;
   networking.useNetworkd = true;
   networking.nameservers = [
