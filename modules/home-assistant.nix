@@ -404,8 +404,20 @@ in
       clientMaxBodySize = "1024m";
 
       virtualHosts =
+        # Reject anything that does not match a known name. Without this, nginx falls
+        # back to whichever server block happens to be declared first, so hitting the
+        # box by bare IP silently served Home Assistant -- including its unauthenticated
+        # onboarding page, to anyone on the LAN, before onboarding is completed.
+        {
+          "_" = {
+            default = true;
+            rejectSSL = true;
+            locations."/".return = "444";
+          };
+        }
+
         # Real vhosts on the public zone, covered by the wildcard.
-        lib.mapAttrs' (
+        // lib.mapAttrs' (
           name: v:
           lib.nameValuePair "${name}.${cfg.proxy.domain}" {
             useACMEHost = cfg.proxy.domain;
