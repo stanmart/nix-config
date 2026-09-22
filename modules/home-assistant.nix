@@ -171,8 +171,8 @@ in
         default = "csigahaz";
         description = ''
           The short, non-public form of the zone. No CA will issue for it, since it is
-          not a real TLD, so these names get a plain-HTTP redirect to the FQDN rather
-          than a certificate that would not validate.
+          not a real TLD, so these names are served over plain HTTP instead. Same
+          backends, no certificate, no redirect to the FQDN.
         '';
       };
 
@@ -420,13 +420,19 @@ in
           }
         ) activeVhosts
 
-        # Short names redirect instead of serving TLS: a *.csigahaz.eu certificate
-        # cannot cover *.csigahaz, so serving them would mean a name mismatch on
-        # every visit. Plain HTTP, 301 to the FQDN.
+        # Short names serve the same backends over plain HTTP. No CA will issue for a
+        # non-public TLD, so TLS here is not an option -- and redirecting to the FQDN
+        # instead would defeat the point of having a short name to type. The tradeoff
+        # is real and local: anything reaching Home Assistant this way sends its
+        # session token in the clear across the LAN, so prefer the .eu name from a
+        # browser and keep these for scripts, curl and devices that cannot do TLS.
         // lib.mapAttrs' (
-          name: _:
+          name: v:
           lib.nameValuePair "${name}.${cfg.proxy.shortDomain}" {
-            locations."/".return = "301 https://${name}.${cfg.proxy.domain}$request_uri";
+            locations."/" = {
+              proxyPass = "http://127.0.0.1:${toString v.port}";
+              proxyWebsockets = true;
+            };
           }
         ) activeVhosts;
     };
