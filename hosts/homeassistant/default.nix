@@ -165,6 +165,28 @@ in
     networks = { };
   };
 
+  # ---- Monitoring ----
+  # Report into the existing Beszel hub. The point is the alerting: without it, the
+  # way you find out this box is down is that the lights do not come on.
+  #
+  # The hub dials the agent on 45876 and authenticates with its own public key, which
+  # goes in the environment file as KEY=... -- not in the repo, since the module warns
+  # that `environment` lands in the world-readable Nix store.
+  #
+  # No Docker socket, so no per-container stats. That access is root-equivalent and
+  # not worth it for a nicer graph; container logs already go to the journal.
+  services.beszel.agent = {
+    enable = true;
+    openFirewall = true;
+    environmentFile = "/var/lib/secrets/beszel-agent.env";
+  };
+
+  systemd.tmpfiles.rules = [
+    # Created empty so the unit fails with a clear error rather than on a missing
+    # EnvironmentFile. Add the hub's key, then restart beszel-agent.
+    "f /var/lib/secrets/beszel-agent.env 0600 root root -"
+  ];
+
   # ---- Smart-home stack ----
   smarthome = {
     # No Zigbee coordinator yet. Left off rather than pointed at a placeholder: with
