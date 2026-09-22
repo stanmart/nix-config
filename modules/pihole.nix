@@ -67,16 +67,22 @@ let
       "dsm.csigahaz.eu,csiganas"
       "file.csigahaz,csiganas"
       "file.csigahaz.eu,csiganas"
-      "homeassistant.csigahaz,homeassistant"
-      "homeassistant.csigahaz.eu,homeassistant"
+      # Fronted by nginx on the homeassistant host, which dispatches on the name.
+      # Only the .eu forms carry a valid certificate; the short forms redirect to them.
+      "ha.csigahaz,homeassistant"
+      "ha.csigahaz.eu,homeassistant"
       "logs.csigahaz,csiganas"
       "logs.csigahaz.eu,csiganas"
+      "matter.csigahaz,homeassistant"
+      "matter.csigahaz.eu,homeassistant"
       "mealie.csigahaz,csiganas"
       "mealie.csigahaz.eu,csiganas"
       "monitoring.csigahaz,csiganas"
       "monitoring.csigahaz.eu,csiganas"
       "nginx-raspi.csigahaz.eu,raspi"
       "nginx.raspi,raspi"
+      "nodered.csigahaz,homeassistant"
+      "nodered.csigahaz.eu,homeassistant"
       "paperless.csigahaz,csiganas"
       "paperless.csigahaz.eu,csiganas"
       "pdf.csigahaz,csiganas"
@@ -103,6 +109,8 @@ let
       "tautulli.csigahaz.eu,csiganas"
       "torrent.csigahaz,csiganas"
       "torrent.csigahaz.eu,csiganas"
+      "zigbee.csigahaz,homeassistant"
+      "zigbee.csigahaz.eu,homeassistant"
     ];
 
     # A records

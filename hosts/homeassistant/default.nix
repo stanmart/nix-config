@@ -131,5 +131,10 @@ in
     zigbee2mqtt.enable = false;
     # coordinator = "tcp://192.168.8.<x>:6638";
     coordinatorAdapter = "zstack";
+
+    # nginx fronts every frontend on its own name, so the backend ports are not
+    # opened to the LAN -- the vhosts are the only way in. Already public in this
+    # repo's commit history, so the ACME address discloses nothing new.
+    proxy.acmeEmail = "martin.stancsics@gmail.com";
   };
 }
