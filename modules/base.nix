@@ -102,4 +102,15 @@
     };
   };
 
+  # The unit reads a token from here, but nothing created the directory, so writing
+  # the token meant mkdir'ing first. The token itself stays out of the repo; an empty
+  # file would not help, since ExecStartPre requires it to be non-empty.
+  systemd.tmpfiles.rules = [
+    "d /var/lib/cloudflared 0700 root root -"
+  ];
+
+  # The CLI, for `cloudflared tunnel list` and friends when a tunnel misbehaves. Free
+  # in closure terms -- the service already references this exact store path.
+  environment.systemPackages = [ pkgs.cloudflared ];
+
 }
