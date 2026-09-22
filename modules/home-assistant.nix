@@ -401,6 +401,18 @@ in
         dnsProvider = "cloudflare";
         environmentFile = cfg.proxy.credentialsFile;
         group = config.services.nginx.group;
+
+        # Resolve the challenge against public DNS, not the system resolver.
+        #
+        # lego finds the zone apex by walking SOA records, and the internal view
+        # CNAMEs the apex (csigahaz.eu -> csiganas) for split-horizon. Following that
+        # takes lego out of the domain entirely, so it never finds the zone and fails
+        # with "failed to find zone eu.: zone could not be found" -- which reads like
+        # a credentials problem and is not one.
+        #
+        # The challenge record is public anyway: it is written to Cloudflare and read
+        # back by Let's Encrypt, so the internal view is the wrong one to consult.
+        dnsResolver = "1.1.1.1:53";
       };
     };
 
