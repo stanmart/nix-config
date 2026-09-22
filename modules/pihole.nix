@@ -67,6 +67,8 @@ let
       "dsm.csigahaz.eu,csiganas"
       "file.csigahaz,csiganas"
       "file.csigahaz.eu,csiganas"
+      "homeassistant.csigahaz,homeassistant"
+      "homeassistant.csigahaz.eu,homeassistant"
       "logs.csigahaz,csiganas"
       "logs.csigahaz.eu,csiganas"
       "mealie.csigahaz,csiganas"
@@ -107,6 +109,8 @@ let
     aRecords = [
       "192.168.8.101 ap.csigahaz"
       "192.168.8.150 csiganas"
+      # Statically configured on the host itself (below the DHCP pool), not a lease.
+      "192.168.8.15 homeassistant"
       "192.168.8.188 raspi"
       "192.168.8.1 router.csigahaz"
     ];
