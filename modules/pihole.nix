@@ -228,8 +228,13 @@ in
       }
     ];
 
-    # Disable tailscale DNS override (we want Pi-hole to be the DNS server)
-    services.tailscale.extraUpFlags = lib.mkForce [
+    # Disable tailscale DNS override (we want Pi-hole to be the DNS server).
+    #
+    # mkAfter, not mkForce: list options concatenate, so forcing here replaced every
+    # other flag rather than adding to them. That silently discarded the host's own
+    # --advertise-routes, leaving the machine documented as the subnet router but not
+    # configured as one -- and dropped --ssh with it.
+    services.tailscale.extraUpFlags = lib.mkAfter [
       "--accept-dns=false"
     ];
 

@@ -36,8 +36,11 @@
     hostIp = "192.168.8.188";
   };
 
+  # --advertise-routes takes CIDRs, not a boolean; "true" is not a route and the flag
+  # would have advertised nothing. Remote access to the LAN over the tailnet depends
+  # on this, and the route still has to be approved in the admin console.
   services.tailscale.extraUpFlags = [
-    "--advertise-routes=true"
+    "--advertise-routes=192.168.8.0/24"
   ];
 
   # The device will be its own DNS provider
