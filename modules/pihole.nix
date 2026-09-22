@@ -64,6 +64,7 @@ let
 
     # A records
     aRecords = [
+      # Statically configured on the host itself (below the DHCP pool), not a lease.
     ];
   };
 
