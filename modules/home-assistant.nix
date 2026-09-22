@@ -91,26 +91,36 @@ let
 
   # Seeded once into /var/lib/homeassistant, then owned by Home Assistant.
   #
-  # NOTE: seeding the http block is necessary but NOT sufficient. Home Assistant
-  # treats a changed http config as *pending* and reverts it unless someone confirms
-  # it by loading the web UI within five minutes of startup -- a guard against
-  # locking yourself out with a bad proxy setting. On an unattended first boot nobody
-  # confirms, so it silently reverts and every proxied request then fails with
-  # "400: Bad Request" and "not set-up for reverse proxies" in the log.
+  # Reverse-proxy settings are deliberately NOT here. They are configured once through
+  # the UI, at Settings > System > Network:
   #
-  # There is no way to pre-confirm this from Nix: the stable/pending marker lives in
-  # Home Assistant's own .storage. Load the UI shortly after first start.
+  #   Use X-Forwarded-For: on
+  #   Trusted proxies:     127.0.0.1, ::1   (nginx runs on this same host)
+  #
+  # Until that is set, every request through nginx returns "400: Bad Request" and the
+  # log says "not set-up for reverse proxies". Reaching Home Assistant directly on
+  # 8123 still works, which is the way in to fix it:
+  #
+  #   ssh -L 8123:127.0.0.1:8123 <host>
+  #
+  # Two reasons this is not in YAML. Home Assistant deprecated HTTP-in-YAML and it
+  # stops working in 2027.2.0; and even before that it never worked unattended --
+  # a YAML http block was staged as *pending* and reverted unless a human confirmed
+  # it in the web UI within five minutes, which no first boot does.
   haConfigSeed = pkgs.writeText "configuration.yaml" ''
     # Seeded by NixOS on first boot (modules/home-assistant.nix).
     # Home Assistant owns this file from here on -- edit it in place, not in the repo.
     default_config:
 
-    http:
-      # Required when reaching HA through the nginx in front of it: without these it
-      # rejects proxied requests outright, and the UI never loads.
-      use_x_forwarded_for: true
-      trusted_proxies:
-    ${lib.concatMapStrings (p: "    - \"${p}\"\n") cfg.trustedProxies}
+    # No http: block. Home Assistant deprecated HTTP-in-YAML -- it stops working in
+    # 2027.2.0 -- and the reverse-proxy settings now live in the UI under
+    # Settings > System > Network.
+    #
+    # Nothing is lost by dropping it, because it never worked unattended anyway: a
+    # YAML http block was only ever *pending* until a human confirmed it through the
+    # web UI within five minutes, and reverted otherwise. It looked declarative
+    # without being declarative. See the note above haConfigSeed.
+
     recorder:
       purge_keep_days: ${toString cfg.recorderKeepDays}
 
@@ -152,18 +162,9 @@ in
       description = "Timezone handed to Home Assistant via TZ.";
     };
 
-    trustedProxies = mkOption {
-      type = types.listOf types.str;
-      default = [
-        "127.0.0.1"
-        "::1"
-      ];
-      description = ''
-        Hosts Home Assistant will accept X-Forwarded-For from. Loopback by default,
-        because the nginx that fronts it runs on this same machine. Home Assistant
-        rejects proxied requests outright if the proxy is not listed here.
-      '';
-    };
+    # No trustedProxies option: Home Assistant no longer accepts it from YAML, so an
+    # option here could only ever have been a lie about where the setting lives. It is
+    # UI state now -- see the note above haConfigSeed.
 
     proxy = {
       enable = mkEnableOption "an nginx reverse proxy in front of the stack" // {
