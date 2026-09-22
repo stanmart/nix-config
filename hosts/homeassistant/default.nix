@@ -23,7 +23,7 @@ in
     (modulesPath + "/installer/scan/not-detected.nix")
     ./disk-config.nix
     ../../modules/home-assistant.nix
-    ../../modules/rsync-backup.nix
+    ../../modules/backup.nix
     ../../modules/auto-upgrade.nix
   ];
 
@@ -31,7 +31,7 @@ in
   # offsite -- so this only has to move bytes, not manage retention.
   stanmart-backup = {
     enable = true;
-    target = "backup@192.168.8.150:/volume1/backup-external/homeassistant";
+    share = "//192.168.8.150/backup-external";
     paths = [
       # The Zigbee network key lives here. Lose it and every paired device has to be
       # re-paired by hand -- this is the directory the whole exercise is for.
