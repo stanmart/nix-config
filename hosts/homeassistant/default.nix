@@ -17,7 +17,6 @@ let
   # this host's wired MAC, so it is not repeated here -- the reservation is the single
   # source of truth and lives in modules/pihole.nix.
   wiredInterface = "enp2s0f1";
-  wirelessInterface = "wlan0";
 in
 {
   imports = [
@@ -106,7 +105,10 @@ in
     # RequiredForOnline=no means a wifi failure degrades to "no wifi" instead of a host
     # that never finishes booting.
     "20-wireless" = {
-      matchConfig.Name = wirelessInterface;
+      # Match on type, not name. Under EndeavourOS this adapter was "wlan0"; NixOS
+      # names it "wlp4s0f4u2u4", and a USB adapter's name encodes the port it is
+      # plugged into -- so any literal name is wrong as soon as it moves sockets.
+      matchConfig.Type = "wlan";
       networkConfig.DHCP = "ipv4";
       dhcpV4Config = {
         RouteMetric = 600;
