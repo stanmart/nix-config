@@ -103,21 +103,24 @@ in
     };
   };
 
+  # Wifi is configured on the box, not here. This repo is public, and an SSID is a
+  # locating identifier: wardriving databases map distinctive SSIDs to street
+  # addresses, and this repo already carries a real name, a domain and a LAN layout.
+  # The SSID adds the one thing they don't -- where the house is. It is broadcast in
+  # the clear anyway, so publishing it protects nobody locally and only helps someone
+  # remote find the place.
+  #
+  # allowAuxiliaryImperativeNetworks lets wpa_supplicant read a writable
+  # /etc/wpa_supplicant/imperative.conf alongside the (empty) declarative one, so both
+  # SSID and passphrase stay off GitHub. Join a network once with:
+  #   sudo wpa_cli -i wlan0
+  #   > add_network / set_network 0 ssid "..." / set_network 0 psk "..." / enable_network 0 / save_config
+  # Cheap to do, because the box is wired and wifi is only a standby path.
   networking.wireless = {
     enable = true;
-    # No secrets in the repo: the PSK is read at runtime from secretsFile, which maps
-    # PSK_HOME -> the "ext:PSK_HOME" reference below. Write it on the host as:
-    #   printf 'PSK_HOME=<passphrase>\n' | sudo tee /var/lib/wpa_supplicant/secrets
-    secretsFile = "/var/lib/wpa_supplicant/secrets";
-    networks."CHANGEME-SSID".pskRaw = "ext:PSK_HOME";
+    allowAuxiliaryImperativeNetworks = true;
+    networks = { };
   };
-
-  # Created empty so wpa_supplicant starts and reports a clean auth failure rather than
-  # failing outright on a missing secrets file.
-  systemd.tmpfiles.rules = [
-    "d /var/lib/wpa_supplicant 0700 root root -"
-    "f /var/lib/wpa_supplicant/secrets 0600 root root -"
-  ];
 
   # ---- Smart-home stack ----
   smarthome = {
