@@ -376,6 +376,13 @@ in
       acceptTerms = true;
       defaults.email = cfg.proxy.acmeEmail;
 
+      # This host renews its own copy of the wildcard rather than being handed one.
+      # That is deliberate, not an oversight: sharing a single certificate means
+      # copying its private key to every machine that terminates TLS, which is a
+      # distribution pipeline plus the key in transit and in backups, re-run every
+      # 90 days. A token scoped to one zone never leaves the machine that uses it
+      # and can be revoked on its own. The cost is that expiry must be monitored
+      # per renewer -- see the homelab notes for the full argument.
       certs.${cfg.proxy.domain} = {
         domain = "*.${cfg.proxy.domain}";
         # DNS-01, not HTTP-01: these names resolve to a LAN address and are never
