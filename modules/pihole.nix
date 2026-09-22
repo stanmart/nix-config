@@ -109,8 +109,7 @@ let
     aRecords = [
       "192.168.8.101 ap.csigahaz"
       "192.168.8.150 csiganas"
-      # Statically configured on the host itself (below the DHCP pool), not a lease.
-      "192.168.8.15 homeassistant"
+      "192.168.8.20 homeassistant"
       "192.168.8.188 raspi"
       "192.168.8.1 router.csigahaz"
     ];
@@ -183,8 +182,15 @@ in
           router = net.routerIp;
           ipv6 = net.dhcp.ipv6;
 
-          # Static DHCP leases
-          hosts = [ ];
+          # Static DHCP leases, as "MAC,IP,hostname".
+          #
+          # These already exist in the bare-metal Pi-hole currently running on raspi.
+          # Mirrored here so they are not silently lost the day that host is switched
+          # over to this flake -- an empty list would hand these addresses back to the
+          # pool and move the machines.
+          hosts = [
+            "88:a4:c2:37:5e:f7,192.168.8.20,homeassistant" # Lenovo M75n, wired
+          ];
 
           # Don’t try to do IPv6 resolution via DHCP path
           resolver.resolveIPv6 = false;

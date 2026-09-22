@@ -13,11 +13,9 @@
 }:
 let
   # ---- Network profile ----
-  # .15 sits below Pi-hole's DHCP pool (192.168.8.20-254), so it is a static address
-  # rather than a reservation: this host comes up on a known IP even if Pi-hole is down.
-  hostIp = "192.168.8.15";
-  prefixLength = 24;
-  gateway = "192.168.8.1";
+  # The address (192.168.8.20) comes from a DHCP reservation on the Pi-hole keyed to
+  # this host's wired MAC, so it is not repeated here -- the reservation is the single
+  # source of truth and lives in modules/pihole.nix.
   wiredInterface = "enp2s0f1";
   wirelessInterface = "wlan0";
 in
@@ -81,13 +79,13 @@ in
   systemd.network.networks = {
     "10-wired" = {
       matchConfig.Name = wiredInterface;
-      address = [ "${hostIp}/${toString prefixLength}" ];
-      routes = [
-        {
-          Gateway = gateway;
-          Metric = 100;
-        }
-      ];
+      networkConfig.DHCP = "ipv4";
+      dhcpV4Config = {
+        RouteMetric = 100;
+        # networking.nameservers below is the single source of truth for resolvers, so
+        # don't let a DHCP-supplied list silently compete with it.
+        UseDNS = false;
+      };
       linkConfig.RequiredForOnline = "routable";
     };
 
@@ -97,7 +95,10 @@ in
     "20-wireless" = {
       matchConfig.Name = wirelessInterface;
       networkConfig.DHCP = "ipv4";
-      dhcpV4Config.RouteMetric = 600;
+      dhcpV4Config = {
+        RouteMetric = 600;
+        UseDNS = false;
+      };
       linkConfig.RequiredForOnline = "no";
     };
   };
@@ -120,8 +121,12 @@ in
 
   # ---- Smart-home stack ----
   smarthome = {
-    # The SLZB-06 must be in Zigbee2MQTT / serial-over-TCP mode before this connects.
-    coordinator = "tcp://192.168.8.60:6638";
+    # No Zigbee coordinator yet. Left off rather than pointed at a placeholder: with
+    # nowhere to connect, Zigbee2MQTT would be restarted forever and bury real failures
+    # in the journal. To turn it on: buy the coordinator, put it into Zigbee2MQTT /
+    # serial-over-TCP mode in its own web UI, set the address here, flip enable.
+    zigbee2mqtt.enable = false;
+    # coordinator = "tcp://192.168.8.<x>:6638";
     coordinatorAdapter = "zstack";
   };
 }

@@ -90,6 +90,7 @@ in
   options.smarthome = {
     coordinator = mkOption {
       type = types.str;
+      default = "";
       example = "tcp://192.168.8.60:6638";
       description = ''
         Zigbee coordinator address, passed to Zigbee2MQTT as serial.port.
@@ -144,6 +145,14 @@ in
       '';
     };
 
+    zigbee2mqtt.enable = mkEnableOption "Zigbee2MQTT" // {
+      default = true;
+      description = ''
+        Run Zigbee2MQTT. Turn this off while no coordinator exists: without one it
+        cannot connect, and systemd would restart it forever, filling the journal with
+        the same failure. Everything else in the stack is independent of it.
+      '';
+    };
     nodeRed.enable = mkEnableOption "Node-RED" // { default = true; };
     matterHub.enable = mkEnableOption "home-assistant-matter-hub" // { default = true; };
   };
@@ -184,6 +193,8 @@ in
         dependsOn = [ "mosquitto" ];
       };
 
+    }
+    // optionalAttrs cfg.zigbee2mqtt.enable {
       zigbee2mqtt = {
         image = images.zigbee2mqtt;
         extraOptions = hostNetwork;
@@ -235,13 +246,17 @@ in
     systemd.tmpfiles.rules = [
       "d /var/lib/mosquitto 0750 root root -"
       "d /var/lib/homeassistant 0750 root root -"
-      "d /var/lib/zigbee2mqtt 0750 root root -"
       # Seeded once, then Home Assistant's. C copies only when the target is absent,
       # so a rebuild never clobbers edits made through the UI or by hand.
       "C /var/lib/homeassistant/configuration.yaml 0640 root root - ${haConfigSeed}"
       "f /var/lib/homeassistant/automations.yaml 0640 root root - []"
       "f /var/lib/homeassistant/scripts.yaml 0640 root root -"
       "f /var/lib/homeassistant/scenes.yaml 0640 root root -"
+    ]
+    ++ lib.optionals cfg.zigbee2mqtt.enable [
+      # Holds the Zigbee network key once paired. Losing it means re-pairing every
+      # device by hand -- this directory is the one that most needs a backup.
+      "d /var/lib/zigbee2mqtt 0750 root root -"
     ]
     ++ lib.optionals cfg.nodeRed.enable [
       # The image's node user is uid 1000; root-owned /data makes it exit on startup.
@@ -257,8 +272,8 @@ in
     networking.firewall = mkIf cfg.openFirewall {
       allowedTCPPorts = [
         stack.ports.homeassistant
-        stack.ports.zigbee2mqtt
       ]
+      ++ lib.optional cfg.zigbee2mqtt.enable stack.ports.zigbee2mqtt
       ++ lib.optional cfg.nodeRed.enable stack.ports.nodeRed
       ++ lib.optional cfg.matterHub.enable stack.ports.matterHub;
 
@@ -271,8 +286,8 @@ in
 
     assertions = [
       {
-        assertion = cfg.coordinator != "";
-        message = "smarthome.coordinator must be set (tcp://<ip>:6638 for a networked coordinator).";
+        assertion = (!cfg.zigbee2mqtt.enable) || (cfg.coordinator != "");
+        message = "smarthome.zigbee2mqtt.enable=true requires smarthome.coordinator (tcp://<ip>:6638 for a networked coordinator).";
       }
       {
         assertion = config.virtualisation.docker.enable;
