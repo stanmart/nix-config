@@ -1,0 +1,56 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:recommended",
+    ":dependencyDashboard",
+  ],
+  // Dependabot's docker ecosystem only covers Dockerfiles, docker-compose and
+  // Kubernetes/Helm manifests, so it cannot see image pins written in Nix. Renovate's
+  // custom manager can, which is why this repo uses Renovate instead.
+  customManagers: [
+    {
+      customType: "regex",
+      description: "Container image pins in modules/container-images.nix",
+      managerFilePatterns: ["/^modules/container-images\\.nix$/"],
+      matchStrings: [
+        // # renovate: datasource=docker depName=<image>
+        // <attr> = "<image>:<tag>@sha256:<digest>";
+        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\s*\\n\\s*\\S+\\s*=\\s*\"[^\"]+:(?<currentValue>[^\"@]+)@(?<currentDigest>sha256:[a-f0-9]+)\";",
+      ],
+      datasourceTemplate: "docker",
+      versioningTemplate: "docker",
+    },
+  ],
+  packageRules: [
+    {
+      matchManagers: ["custom.regex"],
+      addLabels: ["dependencies", "containers"],
+      // Digest-only churn is noise; roll it into the version PR.
+      separateMinorPatch: false,
+    },
+    {
+      // Home Assistant ships a new minor every month and its breaking changes land
+      // there, not in patches. Keep those PRs on their own so the release notes get read.
+      matchDepNames: ["ghcr.io/home-assistant/home-assistant"],
+      matchUpdateTypes: ["minor", "major"],
+      addLabels: ["review-release-notes"],
+      automerge: false,
+    },
+    {
+      matchManagers: ["nix"],
+      addLabels: ["dependencies", "automated"],
+    },
+  ],
+  // Beta and opt-in: updates flake.lock inputs, replacing update-flake-lock.yml.
+  nix: {
+    enabled: true,
+  },
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ["* * 1 * *"],
+  },
+  // Digests are the whole point of the pinning scheme -- never drop them.
+  pinDigests: true,
+  prHourlyLimit: 4,
+  timezone: "Europe/Zurich",
+}
