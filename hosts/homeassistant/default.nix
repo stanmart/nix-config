@@ -23,8 +23,36 @@ in
     (modulesPath + "/installer/scan/not-detected.nix")
     ./disk-config.nix
     ../../modules/home-assistant.nix
+    ../../modules/rsync-backup.nix
     ../../modules/auto-upgrade.nix
   ];
+
+  # Nightly copy to the NAS, which already snapshots and ships encrypted copies
+  # offsite -- so this only has to move bytes, not manage retention.
+  stanmart-backup = {
+    enable = true;
+    target = "backup@192.168.8.150:/volume1/martin/backup/homeassistant";
+    paths = [
+      # The Zigbee network key lives here. Lose it and every paired device has to be
+      # re-paired by hand -- this is the directory the whole exercise is for.
+      "/var/lib/zigbee2mqtt"
+      "/var/lib/homeassistant"
+      "/var/lib/node-red"
+      "/var/lib/home-assistant-matter-hub"
+      "/var/lib/mosquitto"
+    ];
+    excludes = [
+      # The recorder database is the only hot file here, and the least valuable: it
+      # is history, and it is regenerable. Excluding it removes the risk of rsync
+      # copying a torn SQLite file mid-write, which would otherwise be the one reason
+      # to stop the containers during a backup.
+      "home-assistant_v2.db*"
+      # Regenerable caches and noise.
+      "*.log*"
+      "tts/"
+      "deps/"
+    ];
+  };
 
   # Auto-upgrade from GitHub weekly. Headless and unattended, so reboots are allowed --
   # the container stack comes back on its own.
