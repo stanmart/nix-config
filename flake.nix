@@ -18,7 +18,11 @@
         modules = [
           # Base modules
           ./modules/base.nix
-          
+
+          # mkHost took a hostname and never used it, so every machine came up as the
+          # NixOS default "nixos". mkDefault so a host file can still override.
+          { networking.hostName = nixpkgs.lib.mkDefault hostname; }
+
           # Home Manager
           home-manager.nixosModules.home-manager
           {
