@@ -40,8 +40,12 @@ let
       mqtt = 1883; # loopback only -- deliberately never opened in the firewall
     };
 
-    # node-red's image runs as uid/gid 1000 and will not start if /data is root-owned.
+    # Images that drop privileges need their state directory owned to match, or they
+    # cannot write to it. The failure is not always loud: Node-RED refuses to start,
+    # but Mosquitto serves happily and only fails to persist, one line per
+    # autosave_interval.
     nodeRedUid = 1000;
+    mosquittoUid = 1883;
 
     matterHubEnvFile = "/var/lib/home-assistant-matter-hub/env";
   };
@@ -326,7 +330,7 @@ in
     };
 
     systemd.tmpfiles.rules = [
-      "d /var/lib/mosquitto 0750 root root -"
+      "d /var/lib/mosquitto 0750 ${toString stack.mosquittoUid} ${toString stack.mosquittoUid} -"
       "d /var/lib/homeassistant 0750 root root -"
       # Seeded once, then Home Assistant's. C copies only when the target is absent,
       # so a rebuild never clobbers edits made through the UI or by hand.
