@@ -194,6 +194,16 @@ in
     # in the journal. To turn it on: buy the coordinator, put it into Zigbee2MQTT /
     # serial-over-TCP mode in its own web UI, set the address here, flip enable.
     zigbee2mqtt.enable = false;
+
+    # Off, not removed. Node-RED's configuration is a flows.json the canvas writes --
+    # versionable in principle, unreviewable in practice, and the only thing here whose
+    # config could not be read as a diff. Automations that live in text (native YAML,
+    # or pyscript) can be symlinked in from this repo instead, which puts them on the
+    # declarative side of the line rather than in app state.
+    #
+    # Left enabled-by-default in the module so this reads as a decision rather than an
+    # omission, and so re-enabling is one word.
+    nodeRed.enable = false;
     # coordinator = "tcp://192.168.8.<x>:6638";
     coordinatorAdapter = "zstack";
 
