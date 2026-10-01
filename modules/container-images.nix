@@ -13,7 +13,7 @@
 #   skopeo inspect --format '{{.Digest}}' docker://<registry>/<repo>:<tag>
 {
   # renovate: datasource=docker depName=ghcr.io/home-assistant/home-assistant
-  homeassistant = "ghcr.io/home-assistant/home-assistant:2026.9.3@sha256:d8922685169707fd91e8b9729902d975f06157d005e422874d201e0261dda196";
+  homeassistant = "ghcr.io/home-assistant/home-assistant:2026.9.4@sha256:3e6710a7ab2a61311d9d899b719f6c3657791c63e8f4942cec4ebc42401d6b76";
 
   # renovate: datasource=docker depName=eclipse-mosquitto
   mosquitto = "eclipse-mosquitto:2.0.22@sha256:199ea8ef2e35ec2b1b37e59cfd1dbae538ed4dfa4a2251a121a52215a6248a21";
