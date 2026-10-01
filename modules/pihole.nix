@@ -69,8 +69,8 @@ let
       "file.csigahaz.eu,csiganas"
       # Fronted by nginx on the homeassistant host, which dispatches on the name.
       # Only the .eu forms carry a valid certificate; the short forms redirect to them.
-      "ha.csigahaz,homeassistant"
-      "ha.csigahaz.eu,homeassistant"
+      "home.csigahaz,homeassistant"
+      "home.csigahaz.eu,homeassistant"
       "logs.csigahaz,csiganas"
       "logs.csigahaz.eu,csiganas"
       "matter.csigahaz,homeassistant"
