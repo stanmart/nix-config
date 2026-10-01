@@ -56,7 +56,7 @@ let
   # so a port change cannot leave the proxy pointing somewhere stale. Each entry is
   # served only when the service behind it is actually enabled.
   vhosts = {
-    ha = {
+    home = {
       port = stack.ports.homeassistant;
       enabled = true;
     };
