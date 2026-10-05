@@ -25,5 +25,5 @@
   node-red = "nodered/node-red:4.1.15-22@sha256:7aa04e1c7be16aec5b4b4d6e64ae863c4720b0ab18e2c1f46905f7b0c71e3a19";
 
   # renovate: datasource=docker depName=ghcr.io/riddix/home-assistant-matter-hub
-  home-assistant-matter-hub = "ghcr.io/riddix/home-assistant-matter-hub:2.0.57@sha256:3f63aca9cd94162c0736859b43949e95d164d2d47dbd1239574738e583c77661";
+  home-assistant-matter-hub = "ghcr.io/riddix/home-assistant-matter-hub:2.0.58@sha256:3b1aa47b49d6f99dac336633f5a3f3ceed7a340b4e9cd4bdd90fbebd0e32db4e";
 }
