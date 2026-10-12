@@ -22,7 +22,7 @@
   zigbee2mqtt = "ghcr.io/koenkk/zigbee2mqtt:2.14.1@sha256:fef0de769dcd04c27b3a6d277b61046eb96284bdd4198dcb1687c3a01b3020f3";
 
   # renovate: datasource=docker depName=nodered/node-red
-  node-red = "nodered/node-red:4.1.15-22@sha256:7aa04e1c7be16aec5b4b4d6e64ae863c4720b0ab18e2c1f46905f7b0c71e3a19";
+  node-red = "nodered/node-red:4.1.16-22@sha256:3e71dc4eb9aed6e62f8179dfa4f962bd10404aec92e84147a6032c9b3abc387f";
 
   # renovate: datasource=docker depName=ghcr.io/riddix/home-assistant-matter-hub
   home-assistant-matter-hub = "ghcr.io/riddix/home-assistant-matter-hub:2.0.57@sha256:3f63aca9cd94162c0736859b43949e95d164d2d47dbd1239574738e583c77661";
