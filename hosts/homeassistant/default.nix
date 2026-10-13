@@ -13,9 +13,9 @@
 }:
 let
   # ---- Network profile ----
-  # The address (192.168.8.20) comes from a DHCP reservation on the Pi-hole keyed to
-  # this host's wired MAC, so it is not repeated here -- the reservation is the single
-  # source of truth and lives in modules/pihole.nix.
+  # The address (192.168.8.20) comes from a DHCP reservation keyed to this host's
+  # wired MAC, so it is not repeated here -- the reservation on the LAN's DHCP server
+  # is the single source of truth.
   wiredInterface = "enp2s0f1";
 in
 {

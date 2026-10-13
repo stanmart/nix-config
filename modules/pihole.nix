@@ -1,5 +1,11 @@
 # Pi-hole profile (authoritative for internal split DNS + filtering resolver)
 #
+# ============================================================================
+# NEEDS CONFIG: network-specific values (domain, router IP, DHCP range, static
+# leases, CNAME and A records) are placeholders and must be filled in before
+# this module is deployed. Search for "CHANGEME".
+# ============================================================================
+#
 # Enable by importing this module.
 #
 # Philosophy:
@@ -18,16 +24,16 @@ let
 
   # ---- Network profile (edit once per network) ----
   net = {
-    # Local domain -- example.lan is handled explicitly via CNAME records
-    domain = "example.lan";
+    # Local domain -- handled explicitly via CNAME records
+    domain = "example.lan"; # CHANGEME
 
     # Router/gateway for DHCP option router
-    routerIp = "192.168.1.1";
+    routerIp = "192.168.1.1"; # CHANGEME
 
     # DHCP pool (only used if enableDhcp=true)
     dhcp = {
-      rangeStart = "192.168.1.20";
-      rangeEnd   = "192.168.1.254";
+      rangeStart = "192.168.1.100"; # CHANGEME
+      rangeEnd   = "192.168.1.254"; # CHANGEME
       leaseTime  = "2d";
       ipv6       = false;
     };
@@ -59,13 +65,14 @@ let
     # Split DNS: explicit records only
     # Format per your earlier example: "alias,target"
     cnameRecords = [
-      # Fronted by nginx on the homeassistant host, which dispatches on the name.
-      # Only the .eu forms carry a valid certificate; the short forms redirect to them.
-      "nginx.raspi,raspi"
+      # CHANGEME, e.g.
+      # "service.example.lan,somehost"
     ];
 
     # A records
     aRecords = [
+      # CHANGEME, e.g.
+      # "192.168.1.10 somehost"
     ];
   };
 
@@ -137,12 +144,9 @@ in
           ipv6 = net.dhcp.ipv6;
 
           # Static DHCP leases, as "MAC,IP,hostname".
-          #
-          # These already exist in the bare-metal Pi-hole currently running on raspi.
-          # Mirrored here so they are not silently lost the day that host is switched
-          # over to this flake -- an empty list would hand these addresses back to the
-          # pool and move the machines.
           hosts = [
+            # CHANGEME, e.g.
+            # "aa:bb:cc:dd:ee:ff,192.168.1.10,somehost"
           ];
 
           # Don’t try to do IPv6 resolution via DHCP path

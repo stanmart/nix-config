@@ -1,5 +1,8 @@
 # NixOS configuration for Raspberry Pi with Pi-hole
 # Initial minimal configuration for aarch64
+#
+# NEEDS CONFIG: the LAN addresses below are placeholders, as are the network
+# values in modules/pihole.nix. Search for "CHANGEME".
 {
   config,
   pkgs,
@@ -33,14 +36,14 @@
   pihole = {
     interface = "eth0";
     enableDhcp = true;
-    hostIp = "192.168.1.188";
+    hostIp = "192.168.1.2"; # CHANGEME
   };
 
   # --advertise-routes takes CIDRs, not a boolean; "true" is not a route and the flag
   # would have advertised nothing. Remote access to the LAN over the tailnet depends
   # on this, and the route still has to be approved in the admin console.
   services.tailscale.extraUpFlags = [
-    "--advertise-routes=192.168.1.0/24"
+    "--advertise-routes=192.168.1.0/24" # CHANGEME
   ];
 
   # The device will be its own DNS provider
