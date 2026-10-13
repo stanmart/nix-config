@@ -47,10 +47,14 @@
   },
   lockFileMaintenance: {
     enabled: true,
-    schedule: ["* * 1 * *"],
+    // Its default schedule is Monday mornings only; the workflow's monthly cron
+    // decides when Renovate runs, so let it act on every run.
+    schedule: ["at any time"],
   },
   // Digests are the whole point of the pinning scheme -- never drop them.
   pinDigests: true,
-  prHourlyLimit: 4,
+  // Renovate only runs once a month, so an hourly cap would push the overflow to
+  // the next month rather than the next hour.
+  prHourlyLimit: 0,
   timezone: "Europe/Zurich",
 }
