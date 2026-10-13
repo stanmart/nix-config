@@ -2,8 +2,9 @@ name: Renovate
 
 on:
   schedule:
-    # Twice a week, early morning UTC.
-    - cron: '0 3 * * 1,4'
+    # Monthly on the 1st, early morning UTC. This is the only cadence knob: the
+    # Renovate config itself leaves scheduling to this trigger.
+    - cron: '0 3 1 * *'
   workflow_dispatch:
     inputs:
       logLevel:
