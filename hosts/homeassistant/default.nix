@@ -189,11 +189,12 @@ in
 
   # ---- Smart-home stack ----
   smarthome = {
-    # No Zigbee coordinator yet. Left off rather than pointed at a placeholder: with
-    # nowhere to connect, Zigbee2MQTT would be restarted forever and bury real failures
-    # in the journal. To turn it on: buy the coordinator, put it into Zigbee2MQTT /
-    # serial-over-TCP mode in its own web UI, set the address here, flip enable.
-    zigbee2mqtt.enable = false;
+    # SMLIGHT SLZB-MR5U over Ethernet. The address is a DHCP reservation, used as a
+    # bare IP rather than a DNS name so the Zigbee network does not depend on Pi-hole.
+    # The coordinator must be in Zigbee2MQTT / serial-over-TCP mode in its own web UI.
+    coordinator = "tcp://192.168.8.167:6638";
+    coordinatorAdapter = "ember";
+    coordinatorTransmitPower = 20;
 
     # Off, not removed. Node-RED's configuration is a flows.json the canvas writes --
     # versionable in principle, unreviewable in practice, and the only thing here whose
@@ -204,8 +205,6 @@ in
     # Left enabled-by-default in the module so this reads as a decision rather than an
     # omission, and so re-enabling is one word.
     nodeRed.enable = false;
-    # coordinator = "tcp://192.168.8.<x>:6638";
-    coordinatorAdapter = "zstack";
 
     # nginx fronts every frontend on its own name, so the backend ports are not
     # opened to the LAN -- the vhosts are the only way in. Already public in this

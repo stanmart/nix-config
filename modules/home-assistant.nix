@@ -155,7 +155,17 @@ in
       description = ''
         Zigbee2MQTT adapter driver. "zstack" covers the Texas Instruments CC2652/CC1352
         parts used by the SLZB-06 and SLZB-06M; "ember" is the current driver for the
-        Silicon Labs EFR32 parts in the SLZB-07.
+        Silicon Labs EFR32 parts in the SLZB-07 and SLZB-MR5U.
+      '';
+    };
+
+    coordinatorTransmitPower = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      example = 20;
+      description = ''
+        Coordinator radio transmit power in dBm, passed to Zigbee2MQTT as
+        advanced.transmit_power. null leaves the adapter's firmware default.
       '';
     };
 
@@ -297,6 +307,9 @@ in
           ZIGBEE2MQTT_CONFIG_FRONTEND_PORT = toString stack.ports.zigbee2mqtt;
           ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_ENABLED = "true";
           ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_LEVEL = "info";
+        }
+        // optionalAttrs (cfg.coordinatorTransmitPower != null) {
+          ZIGBEE2MQTT_CONFIG_ADVANCED_TRANSMIT_POWER = toString cfg.coordinatorTransmitPower;
         };
         volumes = [ "/var/lib/zigbee2mqtt:/app/data" ];
       };
