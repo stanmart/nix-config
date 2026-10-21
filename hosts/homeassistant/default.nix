@@ -116,6 +116,13 @@ in
     "9.9.9.9" # Quad9, so a Pi-hole outage does not take name resolution with it
   ];
 
+  # Pi-hole's split-horizon CNAMEs point at single-label NAS hostnames. For an AAAA
+  # query Pi-hole returns the CNAME without a target record, so resolved chases the
+  # target itself -- and by default it never sends single-label names to unicast DNS,
+  # failing the lookup with REFUSED. glibc shrugs that off; musl (Alpine containers,
+  # Home Assistant included) turns it into EAI_AGAIN for the whole getaddrinfo call.
+  services.resolved.settings.Resolve.ResolveUnicastSingleLabel = true;
+
   systemd.network.networks = {
     "10-wired" = {
       matchConfig.Name = wiredInterface;
