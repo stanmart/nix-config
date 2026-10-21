@@ -306,6 +306,10 @@ in
           ZIGBEE2MQTT_CONFIG_FRONTEND_ENABLED = "true";
           ZIGBEE2MQTT_CONFIG_FRONTEND_PORT = toString stack.ports.zigbee2mqtt;
           ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_ENABLED = "true";
+          # Without it, unplugged devices keep their last state in Home Assistant
+          # instead of going unavailable. Defaults: mains devices after 10 min of
+          # silence (pinged first), battery devices after 25 h.
+          ZIGBEE2MQTT_CONFIG_AVAILABILITY_ENABLED = "true";
           ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_LEVEL = "info";
         }
         // optionalAttrs (cfg.coordinatorTransmitPower != null) {
