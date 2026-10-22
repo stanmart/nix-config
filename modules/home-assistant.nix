@@ -59,6 +59,13 @@ let
     home = {
       port = stack.ports.homeassistant;
       enabled = true;
+      # A LAN-only name for the companion app's Internal URL. home.csigahaz.eu also
+      # has a public record (the Cloudflare tunnel), so using it for both Internal and
+      # External URL leaves the app nothing to switch on when the Wi-Fi changes -- it
+      # keeps one URL and waits for DNS caches and a dead websocket to catch up. This
+      # name never gets a public record; it exists only in the Pi-hole. An alias on
+      # the .eu vhost only, so no plain-HTTP short form comes with it.
+      aliases = [ "home-local" ];
     };
     zigbee = {
       port = stack.ports.zigbee2mqtt;
@@ -464,6 +471,7 @@ in
         // lib.mapAttrs' (
           name: v:
           lib.nameValuePair "${name}.${cfg.proxy.domain}" {
+            serverAliases = map (a: "${a}.${cfg.proxy.domain}") (v.aliases or [ ]);
             useACMEHost = cfg.proxy.domain;
             forceSSL = true;
             locations."/" = {
