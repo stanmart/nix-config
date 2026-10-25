@@ -106,7 +106,7 @@ class TileSliderCard extends HTMLElement {
       <ha-card>
         <div class="tile"></div>
         <div class="row">
-          <input type="range" min="1" max="100" step="1" aria-label="Brightness" />
+          <input type="range" min="0" max="100" step="1" aria-label="Brightness" />
         </div>
       </ha-card>
     `;
@@ -114,17 +114,20 @@ class TileSliderCard extends HTMLElement {
     this._row = root.querySelector(".row");
     this._slider = root.querySelector("input");
     this._lastLocal = 0;
-    // Like the stock slider: move freely while dragging, apply on release.
+    // Like the stock slider: move freely while dragging, apply on release. 0 turns it off.
     this._slider.addEventListener("input", () => {
       this._lastLocal = Date.now();
-      this._slider.classList.add("on");
+      this._slider.classList.toggle("on", Number(this._slider.value) > 0);
     });
     this._slider.addEventListener("change", () => {
       this._lastLocal = Date.now();
-      this._hass.callService("light", "turn_on", {
-        entity_id: this._config.entity,
-        brightness_pct: Number(this._slider.value),
-      });
+      const pct = Number(this._slider.value);
+      const entity_id = this._config.entity;
+      if (pct === 0) {
+        this._hass.callService("light", "turn_off", { entity_id });
+      } else {
+        this._hass.callService("light", "turn_on", { entity_id, brightness_pct: pct });
+      }
     });
   }
 
@@ -147,7 +150,7 @@ class TileSliderCard extends HTMLElement {
     const on = stateObj.state === "on";
     if (Date.now() - this._lastLocal > SETTLE_MS) {
       const b = stateObj.attributes.brightness;
-      this._slider.value = on && b ? Math.max(1, Math.round(b / 2.55)) : 1;
+      this._slider.value = on && b ? Math.max(1, Math.round(b / 2.55)) : 0;
       this._slider.classList.toggle("on", on);
     }
   }
