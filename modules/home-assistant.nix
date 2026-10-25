@@ -292,6 +292,11 @@ in
           "/var/lib/homeassistant:/config"
           "/etc/localtime:/etc/localtime:ro"
           "/run/dbus:/run/dbus:ro" # Bluetooth integration
+          # Our own dashboard cards, served as /local/custom-cards/<file>.js. The
+          # dashboard resource that loads them lives in HA's .storage, so its ?v=
+          # must be bumped by hand after a change: /local is served with a 31-day
+          # browser cache.
+          "${./home-assistant-cards}:/config/www/custom-cards:ro"
         ];
         dependsOn = [ "mosquitto" ];
       };
