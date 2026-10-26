@@ -358,6 +358,14 @@ in
       };
     };
 
+    # dependsOn makes the hub Require Home Assistant, so stopping HA by hand stops the
+    # hub too -- but starting HA again does not bring it back, and nothing notices the
+    # bridge is gone until a controller shows every accessory as "No Response". Wanting
+    # it from HA's unit closes that loop.
+    systemd.services.docker-home-assistant-matter-hub = mkIf cfg.matterHub.enable {
+      wantedBy = [ "docker-homeassistant.service" ];
+    };
+
     systemd.tmpfiles.rules = [
       "d /var/lib/mosquitto 0750 ${toString stack.mosquittoUid} ${toString stack.mosquittoUid} -"
       "d /var/lib/homeassistant 0750 root root -"
