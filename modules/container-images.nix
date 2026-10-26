@@ -26,4 +26,7 @@
 
   # renovate: datasource=docker depName=ghcr.io/riddix/home-assistant-matter-hub
   home-assistant-matter-hub = "ghcr.io/riddix/home-assistant-matter-hub:2.0.57@sha256:3f63aca9cd94162c0736859b43949e95d164d2d47dbd1239574738e583c77661";
+
+  # renovate: datasource=docker depName=rhasspy/wyoming-speech-to-phrase
+  speech-to-phrase = "rhasspy/wyoming-speech-to-phrase:1.4.3@sha256:e532f0dbc6b21285c4c784212003865b9167041927328a767cb0beb1a0beaa20";
 }
