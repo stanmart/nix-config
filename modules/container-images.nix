@@ -31,5 +31,5 @@
   speech-to-phrase = "rhasspy/wyoming-speech-to-phrase:1.4.3@sha256:e532f0dbc6b21285c4c784212003865b9167041927328a767cb0beb1a0beaa20";
 
   # renovate: datasource=docker depName=ghcr.io/stanmart/overgang
-  overgang = "ghcr.io/stanmart/overgang:0.1.0@sha256:0de154480bac9800ae7dcfd349514ebe0d9d9c805d7dead26f8182b39a94c053";
+  overgang = "ghcr.io/stanmart/overgang:0.1.1@sha256:67d46c19b8cc2e61231fd5938428cf599d661b389afb11e73e8f9a6c6c684c9f";
 }
