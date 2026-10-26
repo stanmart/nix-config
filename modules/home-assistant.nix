@@ -43,6 +43,7 @@ let
       # image's 10300, a leftover from running beside Whisper; the Wyoming entry in
       # Home Assistant points here, so moving it means re-adding that entry.
       speechToPhrase = 10301;
+      overgang = 5684; # UDP; the TRÅDFRI app only ever uses this port
     };
 
     # Images that drop privileges need their state directory owned to match, or they
@@ -51,9 +52,11 @@ let
     # autosave_interval.
     nodeRedUid = 1000;
     mosquittoUid = 1883;
+    overgangUid = 65532; # distroless "nonroot"
 
     matterHubEnvFile = "/var/lib/home-assistant-matter-hub/env";
     speechToPhraseEnvFile = "/var/lib/speech-to-phrase/env";
+    overgangEnvFile = "/var/lib/overgang/env";
   };
 
   hostNetwork = [ "--network=host" ];
@@ -104,6 +107,36 @@ let
     log_dest stdout
     log_type warning
     log_type error
+  '';
+
+  # Seeded once into /var/lib/overgang, then edited in place: the room layout follows
+  # Home Assistant, which changes without a deploy, so it does not belong in the repo.
+  # Restart the container (systemctl restart docker-overgang) after editing. Rooms and
+  # devices are listed in ÖVERGÅNG's README; the app shows rooms in the order given.
+  overgangConfigSeed = pkgs.writeText "overgang.toml" ''
+    # Seeded by NixOS on first boot (modules/home-assistant.nix).
+    # Edit in place; restart docker-overgang to apply.
+    #
+    # The security code and the Home Assistant token come from /var/lib/overgang/env
+    # (OVERGANG_SECURITY_CODE, OVERGANG_HA_TOKEN), never from this file.
+
+    [gateway]
+    listen = ":${toString stack.ports.overgang}"
+    state_file = "/data/state.json"
+    # Phones pair with this, dash-separated, as the gateway's serial number.
+    mac = "02:00:00:00:4f:47"
+    mdns = true
+
+    [backend]
+    kind = "homeassistant"
+    url = "ws://127.0.0.1:${toString stack.ports.homeassistant}/api/websocket"
+
+    # [[rooms]]
+    # name = "Bedroom"
+    # entity = "light.bedroom_ceiling_lights"  # optional: switches the room at once
+    #
+    #   [[rooms.devices]]
+    #   entity = "light.bedroom_bulb_1"
   '';
 
   # Seeded once into /var/lib/homeassistant, then owned by Home Assistant.
@@ -276,6 +309,9 @@ in
     speechToPhrase.enable = mkEnableOption "speech-to-phrase speech-to-text (Wyoming)" // {
       default = true;
     };
+
+    # Keeps the old TRÅDFRI app working once the lights leave the real gateway.
+    overgang.enable = mkEnableOption "ÖVERGÅNG, an IKEA TRÅDFRI gateway emulator on top of Home Assistant";
   };
 
   config = {
@@ -406,6 +442,32 @@ in
         ];
         dependsOn = [ "homeassistant" ];
       };
+    }
+    // optionalAttrs cfg.overgang.enable {
+      overgang = {
+        image = images.overgang;
+        # Host networking for the same reason as the Matter hub: the app finds the
+        # gateway over mDNS, and talks CoAP over DTLS on a fixed UDP port. It faces the
+        # LAN and holds a Home Assistant token, so it gets nothing else: no root (the
+        # image runs as overgangUid), no capabilities, and a read-only filesystem
+        # apart from /data.
+        extraOptions = hostNetwork ++ [
+          "--read-only"
+          "--cap-drop=ALL"
+          "--security-opt=no-new-privileges"
+        ];
+        cmd = [
+          "serve"
+          "-config"
+          "/data/overgang.toml"
+        ];
+        environment.TZ = cfg.timeZone;
+        # OVERGANG_SECURITY_CODE (what phones pair with) and OVERGANG_HA_TOKEN (a
+        # long-lived Home Assistant token) live here, not in the repo.
+        environmentFiles = [ stack.overgangEnvFile ];
+        volumes = [ "/var/lib/overgang:/data" ];
+        dependsOn = [ "homeassistant" ];
+      };
     };
 
     # dependsOn makes the hub Require Home Assistant, so stopping HA by hand stops the
@@ -413,6 +475,11 @@ in
     # bridge is gone until a controller shows every accessory as "No Response". Wanting
     # it from HA's unit closes that loop.
     systemd.services.docker-home-assistant-matter-hub = mkIf cfg.matterHub.enable {
+      wantedBy = [ "docker-homeassistant.service" ];
+    };
+    # Same loop as the Matter hub: dependsOn stops it with Home Assistant but never
+    # starts it again.
+    systemd.services.docker-overgang = mkIf cfg.overgang.enable {
       wantedBy = [ "docker-homeassistant.service" ];
     };
 
@@ -449,6 +516,13 @@ in
       # clear message until a token is written in as STP_HASS_TOKEN=...
       "f ${stack.speechToPhraseEnvFile} 0600 root root -"
     ]
+    ++ lib.optionals cfg.overgang.enable [
+      # Holds the identities paired phones use. Losing it means re-pairing every phone.
+      "d /var/lib/overgang 0750 ${toString stack.overgangUid} ${toString stack.overgangUid} -"
+      "C /var/lib/overgang/overgang.toml 0640 ${toString stack.overgangUid} ${toString stack.overgangUid} - ${overgangConfigSeed}"
+      # Empty until the security code and token are written in, like the Matter hub's.
+      "f ${stack.overgangEnvFile} 0600 root root -"
+    ]
     ++ lib.optionals cfg.proxy.enable [
       "d /var/lib/secrets 0700 root root -"
       # Likewise: exists but empty, so the ACME unit reports a credentials error
@@ -478,7 +552,10 @@ in
         5353 # mDNS -- HA discovery, and Matter commissioning
         1900 # SSDP
       ]
-      ++ lib.optional cfg.matterHub.enable 5540; # Matter operational discovery
+      ++ lib.optional cfg.matterHub.enable 5540 # Matter operational discovery
+      # CoAP over DTLS for the TRÅDFRI app. Opened regardless of openFirewall: nginx
+      # cannot front it, and DTLS-PSK is its own authentication.
+      ++ lib.optional cfg.overgang.enable stack.ports.overgang;
     };
 
     # ---- Reverse proxy ----

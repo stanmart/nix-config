@@ -40,6 +40,8 @@ in
       "/var/lib/node-red"
       "/var/lib/home-assistant-matter-hub"
       "/var/lib/mosquitto"
+      # Paired phones' identities and the room layout, both edited on the box.
+      "/var/lib/overgang"
     ];
     excludes = [
       # The recorder database is the only hot file here, and the least valuable: it
@@ -217,5 +219,9 @@ in
     # opened to the LAN -- the vhosts are the only way in. Already public in this
     # repo's commit history, so the ACME address discloses nothing new.
     proxy.acmeEmail = "martin.stancsics@gmail.com";
+
+    # The old IKEA TRÅDFRI app, pointed at Home Assistant instead of the real gateway.
+    # The room layout lives in /var/lib/overgang/overgang.toml on the box, not here.
+    overgang.enable = true;
   };
 }
