@@ -52,6 +52,7 @@ let
     # autosave_interval.
     nodeRedUid = 1000;
     mosquittoUid = 1883;
+    overgangUid = 65532; # distroless "nonroot"
 
     matterHubEnvFile = "/var/lib/home-assistant-matter-hub/env";
     speechToPhraseEnvFile = "/var/lib/speech-to-phrase/env";
@@ -446,8 +447,15 @@ in
       overgang = {
         image = images.overgang;
         # Host networking for the same reason as the Matter hub: the app finds the
-        # gateway over mDNS, and talks CoAP over DTLS on a fixed UDP port.
-        extraOptions = hostNetwork;
+        # gateway over mDNS, and talks CoAP over DTLS on a fixed UDP port. It faces the
+        # LAN and holds a Home Assistant token, so it gets nothing else: no root (the
+        # image runs as overgangUid), no capabilities, and a read-only filesystem
+        # apart from /data.
+        extraOptions = hostNetwork ++ [
+          "--read-only"
+          "--cap-drop=ALL"
+          "--security-opt=no-new-privileges"
+        ];
         cmd = [
           "serve"
           "-config"
@@ -510,8 +518,8 @@ in
     ]
     ++ lib.optionals cfg.overgang.enable [
       # Holds the identities paired phones use. Losing it means re-pairing every phone.
-      "d /var/lib/overgang 0750 root root -"
-      "C /var/lib/overgang/overgang.toml 0640 root root - ${overgangConfigSeed}"
+      "d /var/lib/overgang 0750 ${toString stack.overgangUid} ${toString stack.overgangUid} -"
+      "C /var/lib/overgang/overgang.toml 0640 ${toString stack.overgangUid} ${toString stack.overgangUid} - ${overgangConfigSeed}"
       # Empty until the security code and token are written in, like the Matter hub's.
       "f ${stack.overgangEnvFile} 0600 root root -"
     ]
