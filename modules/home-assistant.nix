@@ -38,6 +38,7 @@ let
       nodeRed = 1880;
       matterHub = 8482;
       mqtt = 1883; # loopback only -- deliberately never opened in the firewall
+      overgang = 5684; # UDP; the TRÅDFRI app only ever uses this port
     };
 
     # Images that drop privileges need their state directory owned to match, or they
@@ -48,6 +49,7 @@ let
     mosquittoUid = 1883;
 
     matterHubEnvFile = "/var/lib/home-assistant-matter-hub/env";
+    overgangEnvFile = "/var/lib/overgang/env";
   };
 
   hostNetwork = [ "--network=host" ];
@@ -98,6 +100,36 @@ let
     log_dest stdout
     log_type warning
     log_type error
+  '';
+
+  # Seeded once into /var/lib/overgang, then edited in place: the room layout follows
+  # Home Assistant, which changes without a deploy, so it does not belong in the repo.
+  # Restart the container (systemctl restart docker-overgang) after editing. Rooms and
+  # devices are listed in ÖVERGÅNG's README; the app shows rooms in the order given.
+  overgangConfigSeed = pkgs.writeText "overgang.toml" ''
+    # Seeded by NixOS on first boot (modules/home-assistant.nix).
+    # Edit in place; restart docker-overgang to apply.
+    #
+    # The security code and the Home Assistant token come from /var/lib/overgang/env
+    # (OVERGANG_SECURITY_CODE, OVERGANG_HA_TOKEN), never from this file.
+
+    [gateway]
+    listen = ":${toString stack.ports.overgang}"
+    state_file = "/data/state.json"
+    # Phones pair with this, dash-separated, as the gateway's serial number.
+    mac = "02:00:00:00:4f:47"
+    mdns = true
+
+    [backend]
+    kind = "homeassistant"
+    url = "ws://127.0.0.1:${toString stack.ports.homeassistant}/api/websocket"
+
+    # [[rooms]]
+    # name = "Bedroom"
+    # entity = "light.bedroom_ceiling_lights"  # optional: switches the room at once
+    #
+    #   [[rooms.devices]]
+    #   entity = "light.bedroom_bulb_1"
   '';
 
   # Seeded once into /var/lib/homeassistant, then owned by Home Assistant.
@@ -258,6 +290,9 @@ in
     };
     nodeRed.enable = mkEnableOption "Node-RED" // { default = true; };
     matterHub.enable = mkEnableOption "home-assistant-matter-hub" // { default = true; };
+
+    # Keeps the old TRÅDFRI app working once the lights leave the real gateway.
+    overgang.enable = mkEnableOption "ÖVERGÅNG, an IKEA TRÅDFRI gateway emulator on top of Home Assistant";
   };
 
   config = {
@@ -356,6 +391,25 @@ in
         volumes = [ "/var/lib/home-assistant-matter-hub:/data" ];
         dependsOn = [ "homeassistant" ];
       };
+    }
+    // optionalAttrs cfg.overgang.enable {
+      overgang = {
+        image = images.overgang;
+        # Host networking for the same reason as the Matter hub: the app finds the
+        # gateway over mDNS, and talks CoAP over DTLS on a fixed UDP port.
+        extraOptions = hostNetwork;
+        cmd = [
+          "serve"
+          "-config"
+          "/data/overgang.toml"
+        ];
+        environment.TZ = cfg.timeZone;
+        # OVERGANG_SECURITY_CODE (what phones pair with) and OVERGANG_HA_TOKEN (a
+        # long-lived Home Assistant token) live here, not in the repo.
+        environmentFiles = [ stack.overgangEnvFile ];
+        volumes = [ "/var/lib/overgang:/data" ];
+        dependsOn = [ "homeassistant" ];
+      };
     };
 
     # dependsOn makes the hub Require Home Assistant, so stopping HA by hand stops the
@@ -363,6 +417,11 @@ in
     # bridge is gone until a controller shows every accessory as "No Response". Wanting
     # it from HA's unit closes that loop.
     systemd.services.docker-home-assistant-matter-hub = mkIf cfg.matterHub.enable {
+      wantedBy = [ "docker-homeassistant.service" ];
+    };
+    # Same loop as the Matter hub: dependsOn stops it with Home Assistant but never
+    # starts it again.
+    systemd.services.docker-overgang = mkIf cfg.overgang.enable {
       wantedBy = [ "docker-homeassistant.service" ];
     };
 
@@ -390,6 +449,13 @@ in
       # Created empty so the unit starts and reports a clean auth failure rather than
       # failing on a missing EnvironmentFile. Paste the token in after onboarding.
       "f ${stack.matterHubEnvFile} 0600 root root -"
+    ]
+    ++ lib.optionals cfg.overgang.enable [
+      # Holds the identities paired phones use. Losing it means re-pairing every phone.
+      "d /var/lib/overgang 0750 root root -"
+      "C /var/lib/overgang/overgang.toml 0640 root root - ${overgangConfigSeed}"
+      # Empty until the security code and token are written in, like the Matter hub's.
+      "f ${stack.overgangEnvFile} 0600 root root -"
     ]
     ++ lib.optionals cfg.proxy.enable [
       "d /var/lib/secrets 0700 root root -"
@@ -420,7 +486,10 @@ in
         5353 # mDNS -- HA discovery, and Matter commissioning
         1900 # SSDP
       ]
-      ++ lib.optional cfg.matterHub.enable 5540; # Matter operational discovery
+      ++ lib.optional cfg.matterHub.enable 5540 # Matter operational discovery
+      # CoAP over DTLS for the TRÅDFRI app. Opened regardless of openFirewall: nginx
+      # cannot front it, and DTLS-PSK is its own authentication.
+      ++ lib.optional cfg.overgang.enable stack.ports.overgang;
     };
 
     # ---- Reverse proxy ----

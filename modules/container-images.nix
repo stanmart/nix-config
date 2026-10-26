@@ -26,4 +26,7 @@
 
   # renovate: datasource=docker depName=ghcr.io/riddix/home-assistant-matter-hub
   home-assistant-matter-hub = "ghcr.io/riddix/home-assistant-matter-hub:2.0.57@sha256:3f63aca9cd94162c0736859b43949e95d164d2d47dbd1239574738e583c77661";
+
+  # renovate: datasource=docker depName=ghcr.io/stanmart/overgang
+  overgang = "ghcr.io/stanmart/overgang:0.1.0@sha256:0de154480bac9800ae7dcfd349514ebe0d9d9c805d7dead26f8182b39a94c053";
 }
