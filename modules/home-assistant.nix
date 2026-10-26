@@ -38,6 +38,11 @@ let
       nodeRed = 1880;
       matterHub = 8482;
       mqtt = 1883; # loopback only -- deliberately never opened in the firewall
+      # Wyoming speech-to-text, also loopback only. Voice satellites talk to Home
+      # Assistant, never to this directly, so nothing else needs to reach it. Not the
+      # image's 10300, a leftover from running beside Whisper; the Wyoming entry in
+      # Home Assistant points here, so moving it means re-adding that entry.
+      speechToPhrase = 10301;
       overgang = 5684; # UDP; the TRÅDFRI app only ever uses this port
     };
 
@@ -49,6 +54,7 @@ let
     mosquittoUid = 1883;
 
     matterHubEnvFile = "/var/lib/home-assistant-matter-hub/env";
+    speechToPhraseEnvFile = "/var/lib/speech-to-phrase/env";
     overgangEnvFile = "/var/lib/overgang/env";
   };
 
@@ -291,6 +297,18 @@ in
     nodeRed.enable = mkEnableOption "Node-RED" // { default = true; };
     matterHub.enable = mkEnableOption "home-assistant-matter-hub" // { default = true; };
 
+    # Speech-to-text for Assist, added in Home Assistant through the Wyoming
+    # integration (host 127.0.0.1, port from stack.ports). English only, since
+    # speech-to-phrase has no Hungarian.
+    #
+    # Deliberately the only voice service. Whisper was tried and dropped: base-int8
+    # took ~1.2 s per command on this CPU and misheard names, which is only worth it
+    # with an LLM behind it, and models good enough for Hungarian took 4-20+ s. Piper
+    # was dropped too: commands should succeed silently, not answer out loud.
+    speechToPhrase.enable = mkEnableOption "speech-to-phrase speech-to-text (Wyoming)" // {
+      default = true;
+    };
+
     # Keeps the old TRÅDFRI app working once the lights leave the real gateway.
     overgang.enable = mkEnableOption "ÖVERGÅNG, an IKEA TRÅDFRI gateway emulator on top of Home Assistant";
   };
@@ -392,6 +410,38 @@ in
         dependsOn = [ "homeassistant" ];
       };
     }
+    // optionalAttrs cfg.speechToPhrase.enable {
+      # Recognizes only the commands it can build from Home Assistant's own sentence
+      # templates and the names of exposed entities and areas, which makes it near
+      # instant. It reads those names over the websocket API, hence the token.
+      speech-to-phrase = {
+        image = images.speech-to-phrase;
+        extraOptions = hostNetwork;
+        # The image takes the token only as an argument, so the entrypoint is
+        # wrapped to expand it from the env file at runtime. The image's run.sh
+        # passes our arguments last, so --uri here overrides its 0.0.0.0.
+        entrypoint = "bash";
+        cmd = [
+          "-c"
+          ''
+            [ -n "$STP_HASS_TOKEN" ] || { echo "STP_HASS_TOKEN missing from ${stack.speechToPhraseEnvFile}" >&2; exit 1; }
+            exec bash /run.sh \
+              --uri tcp://127.0.0.1:${toString stack.ports.speechToPhrase} \
+              --hass-websocket-uri ws://127.0.0.1:${toString stack.ports.homeassistant}/api/websocket \
+              --hass-token "$STP_HASS_TOKEN" \
+              --retrain-on-start
+          ''
+        ];
+        # STP_HASS_TOKEN=<long-lived token> lives here, not in the repo.
+        environmentFiles = [ stack.speechToPhraseEnvFile ];
+        # Models and the trained language model -- both regenerable, not backed up.
+        volumes = [
+          "/var/lib/speech-to-phrase/models:/models"
+          "/var/lib/speech-to-phrase/train:/train"
+        ];
+        dependsOn = [ "homeassistant" ];
+      };
+    }
     // optionalAttrs cfg.overgang.enable {
       overgang = {
         image = images.overgang;
@@ -449,6 +499,14 @@ in
       # Created empty so the unit starts and reports a clean auth failure rather than
       # failing on a missing EnvironmentFile. Paste the token in after onboarding.
       "f ${stack.matterHubEnvFile} 0600 root root -"
+    ]
+    ++ lib.optionals cfg.speechToPhrase.enable [
+      "d /var/lib/speech-to-phrase 0750 root root -"
+      "d /var/lib/speech-to-phrase/models 0750 root root -"
+      "d /var/lib/speech-to-phrase/train 0750 root root -"
+      # Same as the Matter hub's: exists but empty, so the container fails with a
+      # clear message until a token is written in as STP_HASS_TOKEN=...
+      "f ${stack.speechToPhraseEnvFile} 0600 root root -"
     ]
     ++ lib.optionals cfg.overgang.enable [
       # Holds the identities paired phones use. Losing it means re-pairing every phone.
