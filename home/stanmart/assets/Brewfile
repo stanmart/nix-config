@@ -5,6 +5,8 @@
 # -----------------------------------
 
 cask "1password-cli"        # let's manage this via brew for now
+cask "antigravity"          # Google's agentic coding desktop app
+cask "antigravity-cli"      # Google's agentic coding TUI app
 cask "antinote"             # simple disposable notes
 cask "copilot-cli"          # GitHub Copilot CLI
 cask "devtoys"              # swiss army knife for developers
