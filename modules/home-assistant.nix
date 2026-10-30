@@ -73,21 +73,23 @@ let
       # has a public record (the Cloudflare tunnel), so using it for both Internal and
       # External URL leaves the app nothing to switch on when the Wi-Fi changes -- it
       # keeps one URL and waits for DNS caches and a dead websocket to catch up. This
-      # name never gets a public record; it exists only in the Pi-hole. An alias on
-      # the .eu vhost only, so no plain-HTTP short form comes with it.
+      # name never gets a public record; it exists only in the Pi-hole.
       aliases = [ "home-local" ];
     };
     zigbee = {
       port = stack.ports.zigbee2mqtt;
       enabled = cfg.zigbee2mqtt.enable;
+      basicAuth = true;
     };
     nodered = {
       port = stack.ports.nodeRed;
       enabled = cfg.nodeRed.enable;
+      basicAuth = true;
     };
     matter = {
       port = stack.ports.matterHub;
       enabled = cfg.matterHub.enable;
+      basicAuth = true;
     };
   };
 
@@ -238,16 +240,6 @@ in
         description = "Zone the service names live under. Served from a wildcard cert.";
       };
 
-      shortDomain = mkOption {
-        type = types.str;
-        default = "csigahaz";
-        description = ''
-          The short, non-public form of the zone. No CA will issue for it, since it is
-          not a real TLD, so these names are served over plain HTTP instead. Same
-          backends, no certificate, no redirect to the FQDN.
-        '';
-      };
-
       acmeEmail = mkOption {
         type = types.str;
         description = "Contact address for the Let's Encrypt account.";
@@ -375,6 +367,9 @@ in
           # Output logs only to console (journald), avoiding unbounded historical log.txt files on disk
           ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_OUTPUT = "[\"console\"]";
         }
+        // optionalAttrs cfg.proxy.enable {
+          ZIGBEE2MQTT_CONFIG_FRONTEND_HOST = "127.0.0.1";
+        }
         // optionalAttrs (cfg.coordinatorTransmitPower != null) {
           ZIGBEE2MQTT_CONFIG_ADVANCED_TRANSMIT_POWER = toString cfg.coordinatorTransmitPower;
         };
@@ -401,6 +396,9 @@ in
           HAMH_HTTP_PORT = toString stack.ports.matterHub;
           HAMH_LOG_LEVEL = "info";
           HAMH_MDNS_NETWORK_INTERFACE = "enp2s0f1";
+        }
+        // optionalAttrs cfg.proxy.enable {
+          HAMH_HTTP_IP_WHITELIST = "127.0.0.1";
         };
         # HAMH_HOME_ASSISTANT_ACCESS_TOKEN lives here, not in the repo. Create a
         # long-lived token in the Home Assistant UI and write it into this file.
@@ -482,6 +480,9 @@ in
     };
     systemd.services.docker-speech-to-phrase = mkIf cfg.speechToPhrase.enable {
       wantedBy = [ "docker-homeassistant.service" ];
+      # Delay restart attempts by 5s so HA warming up its HTTP API does not
+      # trigger systemd's default start-limit-hit.
+      serviceConfig.RestartSec = 5;
     };
 
     # Soft ordering on mosquitto so MQTT container bumps do not pull down HA and Z2M
@@ -540,6 +541,11 @@ in
       # instead of dying on a missing EnvironmentFile. Write the Cloudflare token
       # here as CLOUDFLARE_DNS_API_TOKEN=...
       "f ${cfg.proxy.credentialsFile} 0600 root root -"
+      # HTTP basic auth credentials for exposed web UIs (zigbee, matter, nodered).
+      # Read by nginx worker processes, so group must be nginx.
+      # Generate entries with: htpasswd -nB <user> or openssl passwd -5
+      "d /var/lib/nginx-auth 0750 root ${config.services.nginx.group} -"
+      "f /var/lib/nginx-auth/htpasswd 0640 root ${config.services.nginx.group} -"
     ];
 
     networking.firewall = {
@@ -551,7 +557,7 @@ in
           ++ lib.optional cfg.nodeRed.enable stack.ports.nodeRed
           ++ lib.optional cfg.matterHub.enable stack.ports.matterHub
         )
-        # 80 is not just an ACME concern -- it carries the short-name redirects.
+        # Port 80 carries ACME challenges and HTTP -> HTTPS redirects
         ++ lib.optionals cfg.proxy.enable [
           80
           443
@@ -614,6 +620,9 @@ in
       clientMaxBodySize = "1024m";
 
       virtualHosts =
+        let
+          htpasswdFile = "/var/lib/nginx-auth/htpasswd";
+        in
         # Reject anything that does not match a known name. Without this, nginx falls
         # back to whichever server block happens to be declared first, so hitting the
         # box by bare IP silently served Home Assistant -- including its unauthenticated
@@ -633,27 +642,12 @@ in
             serverAliases = map (a: "${a}.${cfg.proxy.domain}") (v.aliases or [ ]);
             useACMEHost = cfg.proxy.domain;
             forceSSL = true;
+            basicAuthFile = if (v.basicAuth or false) then htpasswdFile else null;
             locations."/" = {
               proxyPass = "http://127.0.0.1:${toString v.port}";
               # Every one of these frontends is a single-page app that loses its
               # live connection without this -- Home Assistant will not even finish
               # loading.
-              proxyWebsockets = true;
-            };
-          }
-        ) activeVhosts
-
-        # Short names serve the same backends over plain HTTP. No CA will issue for a
-        # non-public TLD, so TLS here is not an option -- and redirecting to the FQDN
-        # instead would defeat the point of having a short name to type. The tradeoff
-        # is real and local: anything reaching Home Assistant this way sends its
-        # session token in the clear across the LAN, so prefer the .eu name from a
-        # browser and keep these for scripts, curl and devices that cannot do TLS.
-        // lib.mapAttrs' (
-          name: v:
-          lib.nameValuePair "${name}.${cfg.proxy.shortDomain}" {
-            locations."/" = {
-              proxyPass = "http://127.0.0.1:${toString v.port}";
               proxyWebsockets = true;
             };
           }
