@@ -319,12 +319,6 @@ in
     # oci-containers backend defaults to podman, so this is not optional.
     virtualisation.oci-containers.backend = "docker";
 
-    # The Matter hub requires IPv6 on the Docker daemon.
-    virtualisation.docker.daemon.settings = {
-      ipv6 = true;
-      fixed-cidr-v6 = "fd00::/80";
-    };
-
     virtualisation.oci-containers.containers = {
       mosquitto = {
         image = images.mosquitto;
@@ -405,6 +399,7 @@ in
           HAMH_HOME_ASSISTANT_URL = "http://127.0.0.1:${toString stack.ports.homeassistant}";
           HAMH_HTTP_PORT = toString stack.ports.matterHub;
           HAMH_LOG_LEVEL = "info";
+          HAMH_MDNS_NETWORK_INTERFACE = "enp2s0f1";
         };
         # HAMH_HOME_ASSISTANT_ACCESS_TOKEN lives here, not in the repo. Create a
         # long-lived token in the Home Assistant UI and write it into this file.

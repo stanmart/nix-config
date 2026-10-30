@@ -92,6 +92,13 @@ in
   # Home Assistant reaches BLE devices through the host's dbus socket.
   hardware.bluetooth.enable = true;
 
+  # Dual-homed on 192.168.8.0/24 (wired + standby wifi): prevent ARP flux where
+  # the kernel replies to ARP queries for the wired IP on the wifi interface.
+  boot.kernel.sysctl = {
+    "net.ipv4.conf.all.arp_ignore" = 1;
+    "net.ipv4.conf.all.arp_announce" = 2;
+  };
+
   # nixos-anywhere needs to escalate over SSH. Setting it here rather than in base.nix
   # keeps the change to this host, and means a future reimage needs no manual prep.
   security.sudo.wheelNeedsPassword = false;
@@ -109,9 +116,13 @@ in
   # Rebuild Plan flags losing this role as something that breaks remote access to the
   # NAS silently, and the way to not have that happen is to not have a handover day.
   #
-  # Inert until the route is approved in the admin console -- separately from the exit
-  # node, and separately per machine.
-  services.tailscale.extraUpFlags = [ "--advertise-routes=192.168.8.0/24" ];
+  # Apply via extraSetFlags so settings actually take effect via tailscaled-set
+  # (extraUpFlags is only invoked if authKeyFile is set). Do not accept routes here
+  # so local LAN traffic never gets routed out over Tailscale table 52.
+  services.tailscale.extraSetFlags = [
+    "--advertise-routes=192.168.8.0/24"
+    "--accept-routes=false"
+  ];
 
   networking.useDHCP = false;
   networking.useNetworkd = true;

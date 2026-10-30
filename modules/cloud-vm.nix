@@ -42,4 +42,9 @@
 
   # Additional firewall ports for Caddy
   networking.firewall.allowedTCPPorts = [ 80 443 ];
+
+  # Cloud VMs accept subnet routes advertised by LAN nodes (e.g. raspi/homeassistant)
+  services.tailscale.extraSetFlags = [
+    "--accept-routes=true"
+  ];
 }
