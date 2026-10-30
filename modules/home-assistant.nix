@@ -399,7 +399,13 @@ in
     // optionalAttrs cfg.matterHub.enable {
       home-assistant-matter-hub = {
         image = images.home-assistant-matter-hub;
-        extraOptions = hostNetwork;
+        # The image's health check asks for localhost, which resolves to ::1 and is
+        # refused by the 127.0.0.1-only whitelist below -- the container reported
+        # unhealthy while serving fine. The whitelist takes a single value from the
+        # environment, so the check is pointed at 127.0.0.1 instead.
+        extraOptions = hostNetwork ++ [
+          "--health-cmd=wget -qO /dev/null http://127.0.0.1:${toString stack.ports.matterHub}/api/health/live || exit 1"
+        ];
         environment = {
           TZ = cfg.timeZone;
           HAMH_HOME_ASSISTANT_URL = "http://127.0.0.1:${toString stack.ports.homeassistant}";
