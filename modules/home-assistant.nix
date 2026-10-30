@@ -11,7 +11,7 @@
 # - Mosquitto listens on loopback only, so the stack needs no MQTT credentials at all.
 # - App state lives under /var/lib/<service>; nothing but the Nix store is managed here.
 # - No secrets in the repo: the Matter hub's Home Assistant token is read at runtime
-#   from /var/lib/home-assistant-matter-hub/env, the same shape as base.nix's
+#   from /var/lib/secrets/matter-hub.env, the same shape as base.nix's
 #   /var/lib/cloudflared/token.
 #
 # Deliberate limitation: Home Assistant and Zigbee2MQTT both rewrite their own config
@@ -54,9 +54,10 @@ let
     mosquittoUid = 1883;
     overgangUid = 65532; # distroless "nonroot"
 
-    matterHubEnvFile = "/var/lib/home-assistant-matter-hub/env";
-    speechToPhraseEnvFile = "/var/lib/speech-to-phrase/env";
-    overgangEnvFile = "/var/lib/overgang/env";
+    # Environment files are kept in /var/lib/secrets (0700 root:root) out of the containers' writable data directories.
+    matterHubEnvFile = "/var/lib/secrets/matter-hub.env";
+    speechToPhraseEnvFile = "/var/lib/secrets/speech-to-phrase.env";
+    overgangEnvFile = "/var/lib/secrets/overgang.env";
   };
 
   hostNetwork = [ "--network=host" ];
@@ -117,7 +118,7 @@ let
     # Seeded by NixOS on first boot (modules/home-assistant.nix).
     # Edit in place; restart docker-overgang to apply.
     #
-    # The security code and the Home Assistant token come from /var/lib/overgang/env
+    # The security code and the Home Assistant token come from /var/lib/secrets/overgang.env
     # (OVERGANG_SECURITY_CODE, OVERGANG_HA_TOKEN), never from this file.
 
     [gateway]
@@ -494,6 +495,7 @@ in
     };
 
     systemd.tmpfiles.rules = [
+      "d /var/lib/secrets 0700 root root -"
       "d /var/lib/mosquitto 0750 ${toString stack.mosquittoUid} ${toString stack.mosquittoUid} -"
       "d /var/lib/homeassistant 0750 root root -"
       # Seeded once, then Home Assistant's. C copies only when the target is absent,
@@ -534,8 +536,7 @@ in
       "f ${stack.overgangEnvFile} 0600 root root -"
     ]
     ++ lib.optionals cfg.proxy.enable [
-      "d /var/lib/secrets 0700 root root -"
-      # Likewise: exists but empty, so the ACME unit reports a credentials error
+      # Exists but empty, so the ACME unit reports a credentials error
       # instead of dying on a missing EnvironmentFile. Write the Cloudflare token
       # here as CLOUDFLARE_DNS_API_TOKEN=...
       "f ${cfg.proxy.credentialsFile} 0600 root root -"
