@@ -682,6 +682,13 @@ in
               # live connection without this -- Home Assistant will not even finish
               # loading.
               proxyWebsockets = true;
+              # recommendedProxySettings closes an upstream that is silent for 60s, and
+              # a websocket that only waits for events is exactly that -- the Matter
+              # server dashboard dropped to "Connection lost" every minute.
+              extraConfig = ''
+                proxy_read_timeout 1h;
+                proxy_send_timeout 1h;
+              '';
             };
           }
         ) activeVhosts;
