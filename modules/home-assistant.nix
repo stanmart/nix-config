@@ -352,7 +352,7 @@ in
           # browser cache.
           "${./home-assistant-cards}:/config/www/custom-cards:ro"
         ];
-        dependsOn = [ "mosquitto" ];
+        # Soft dependency on mosquitto handled below via systemd.services
       };
 
     }
@@ -360,7 +360,7 @@ in
       zigbee2mqtt = {
         image = images.zigbee2mqtt;
         extraOptions = hostNetwork;
-        dependsOn = [ "mosquitto" ];
+        # Soft dependency on mosquitto handled below via systemd.services
         # ZIGBEE2MQTT_CONFIG_* takes precedence over configuration.yaml, so the static
         # half of the config stays declarative while Zigbee2MQTT keeps ownership of the
         # file it writes pairing state into.
@@ -483,6 +483,19 @@ in
     # starts it again.
     systemd.services.docker-overgang = mkIf cfg.overgang.enable {
       wantedBy = [ "docker-homeassistant.service" ];
+    };
+    systemd.services.docker-speech-to-phrase = mkIf cfg.speechToPhrase.enable {
+      wantedBy = [ "docker-homeassistant.service" ];
+    };
+
+    # Soft ordering on mosquitto so MQTT container bumps do not pull down HA and Z2M
+    systemd.services.docker-homeassistant = {
+      after = [ "docker-mosquitto.service" ];
+      wants = [ "docker-mosquitto.service" ];
+    };
+    systemd.services.docker-zigbee2mqtt = mkIf cfg.zigbee2mqtt.enable {
+      after = [ "docker-mosquitto.service" ];
+      wants = [ "docker-mosquitto.service" ];
     };
 
     systemd.tmpfiles.rules = [
