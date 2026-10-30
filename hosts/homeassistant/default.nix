@@ -50,9 +50,11 @@ in
       # to stop the containers during a backup.
       "home-assistant_v2.db*"
       # Regenerable caches and noise.
+      # Note: GNU tar excludes must not end in a slash, otherwise they match nothing.
       "*.log*"
-      "tts/"
-      "deps/"
+      "homeassistant/tts"
+      "homeassistant/deps"
+      "homeassistant/backups"
     ];
   };
 

@@ -377,6 +377,8 @@ in
           # silence (pinged first), battery devices after 25 h.
           ZIGBEE2MQTT_CONFIG_AVAILABILITY_ENABLED = "true";
           ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_LEVEL = "info";
+          # Output logs only to console (journald), avoiding unbounded historical log.txt files on disk
+          ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_OUTPUT = "[\"console\"]";
         }
         // optionalAttrs (cfg.coordinatorTransmitPower != null) {
           ZIGBEE2MQTT_CONFIG_ADVANCED_TRANSMIT_POWER = toString cfg.coordinatorTransmitPower;
