@@ -37,6 +37,7 @@ let
       zigbee2mqtt = 8080;
       nodeRed = 1880;
       matterHub = 8482;
+      matterServer = 5580; # loopback only (LISTEN_ADDRESS = 127.0.0.1) -- reached via nginx basicAuth or local HA
       mqtt = 1883; # loopback only -- deliberately never opened in the firewall
       # Wyoming speech-to-text, also loopback only. Voice satellites talk to Home
       # Assistant, never to this directly, so nothing else needs to reach it. Not the
@@ -51,6 +52,7 @@ let
     # but Mosquitto serves happily and only fails to persist, one line per
     # autosave_interval.
     nodeRedUid = 1000;
+    matterServerUid = 1000;
     mosquittoUid = 1883;
     overgangUid = 65532; # distroless "nonroot"
 
@@ -89,6 +91,11 @@ let
     matter = {
       port = stack.ports.matterHub;
       enabled = cfg.matterHub.enable;
+      basicAuth = true;
+    };
+    matter-server = {
+      port = stack.ports.matterServer;
+      enabled = cfg.matterServer.enable;
       basicAuth = true;
     };
   };
@@ -290,6 +297,9 @@ in
     };
     nodeRed.enable = mkEnableOption "Node-RED" // { default = true; };
     matterHub.enable = mkEnableOption "home-assistant-matter-hub" // { default = true; };
+    matterServer.enable = mkEnableOption "Matter Server (matterjs-server controller backend)" // {
+      default = true;
+    };
 
     # Speech-to-text for Assist, added in Home Assistant through the Wyoming
     # integration (host 127.0.0.1, port from stack.ports). English only, since
@@ -407,6 +417,23 @@ in
         dependsOn = [ "homeassistant" ];
       };
     }
+    // optionalAttrs cfg.matterServer.enable {
+      matter-server = {
+        image = images.matter-server;
+        extraOptions = hostNetwork;
+        user = "${toString stack.matterServerUid}:${toString stack.matterServerUid}";
+        environment = {
+          TZ = cfg.timeZone;
+          LOG_LEVEL = "info";
+          LISTEN_ADDRESS = "127.0.0.1";
+          PRIMARY_INTERFACE = "enp2s0f1";
+          PRODUCTION_MODE = "true";
+        };
+        volumes = [
+          "/var/lib/matter-server:/data"
+        ];
+      };
+    }
     // optionalAttrs cfg.speechToPhrase.enable {
       # Recognizes only the commands it can build from Home Assistant's own sentence
       # templates and the names of exposed entities and areas, which makes it near
@@ -485,10 +512,12 @@ in
       serviceConfig.RestartSec = 5;
     };
 
-    # Soft ordering on mosquitto so MQTT container bumps do not pull down HA and Z2M
+    # Soft ordering on mosquitto and matter-server so container bumps do not pull down HA
     systemd.services.docker-homeassistant = {
-      after = [ "docker-mosquitto.service" ];
-      wants = [ "docker-mosquitto.service" ];
+      after = [ "docker-mosquitto.service" ]
+        ++ lib.optional cfg.matterServer.enable "docker-matter-server.service";
+      wants = [ "docker-mosquitto.service" ]
+        ++ lib.optional cfg.matterServer.enable "docker-matter-server.service";
     };
     systemd.services.docker-zigbee2mqtt = mkIf cfg.zigbee2mqtt.enable {
       after = [ "docker-mosquitto.service" ];
@@ -520,6 +549,10 @@ in
       # Created empty so the unit starts and reports a clean auth failure rather than
       # failing on a missing EnvironmentFile. Paste the token in after onboarding.
       "f ${stack.matterHubEnvFile} 0600 root root -"
+    ]
+    ++ lib.optionals cfg.matterServer.enable [
+      # The image runs as uid 1000; root-owned /data makes it fail to persist pairing state.
+      "d /var/lib/matter-server 0750 ${toString stack.matterServerUid} ${toString stack.matterServerUid} -"
     ]
     ++ lib.optionals cfg.speechToPhrase.enable [
       "d /var/lib/speech-to-phrase 0750 root root -"
