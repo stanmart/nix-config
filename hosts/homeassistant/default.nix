@@ -39,6 +39,7 @@ in
       "/var/lib/homeassistant"
       "/var/lib/node-red"
       "/var/lib/home-assistant-matter-hub"
+      "/var/lib/matter-server"
       "/var/lib/mosquitto"
       # Paired phones' identities and the room layout, both edited on the box.
       "/var/lib/overgang"
@@ -97,6 +98,9 @@ in
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.arp_ignore" = 1;
     "net.ipv4.conf.all.arp_announce" = 2;
+    # Battery-powered Matter devices report every few minutes; raise UDP conntrack timeout
+    # from the 120s default so the firewall does not drop their reports.
+    "net.netfilter.nf_conntrack_udp_timeout_stream" = 3600;
   };
 
   # nixos-anywhere needs to escalate over SSH. Setting it here rather than in base.nix
