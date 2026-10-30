@@ -89,13 +89,13 @@ let
       basicAuth = true;
     };
     matter = {
-      port = stack.ports.matterHub;
-      enabled = cfg.matterHub.enable;
-      basicAuth = true;
-    };
-    matter-server = {
       port = stack.ports.matterServer;
       enabled = cfg.matterServer.enable;
+      basicAuth = true;
+    };
+    matter-hub = {
+      port = stack.ports.matterHub;
+      enabled = cfg.matterHub.enable;
       basicAuth = true;
     };
   };
@@ -574,7 +574,7 @@ in
       # instead of dying on a missing EnvironmentFile. Write the Cloudflare token
       # here as CLOUDFLARE_DNS_API_TOKEN=...
       "f ${cfg.proxy.credentialsFile} 0600 root root -"
-      # HTTP basic auth credentials for exposed web UIs (zigbee, matter, nodered).
+      # HTTP basic auth credentials for exposed web UIs (zigbee, matter, matter-hub, nodered).
       # Read by nginx worker processes, so group must be nginx.
       # Generate entries with: htpasswd -nB <user> or openssl passwd -5
       "d /var/lib/nginx-auth 0750 root ${config.services.nginx.group} -"
