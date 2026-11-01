@@ -16,7 +16,7 @@
   homeassistant = "ghcr.io/home-assistant/home-assistant:2026.9.3@sha256:d8922685169707fd91e8b9729902d975f06157d005e422874d201e0261dda196";
 
   # renovate: datasource=docker depName=eclipse-mosquitto
-  mosquitto = "eclipse-mosquitto:2.0.22@sha256:199ea8ef2e35ec2b1b37e59cfd1dbae538ed4dfa4a2251a121a52215a6248a21";
+  mosquitto = "eclipse-mosquitto:2.0.22@sha256:09b62ff32c2e7b64d4b431b9a89236073289b68db273de2b089edeb9b0d92b5c";
 
   # renovate: datasource=docker depName=ghcr.io/koenkk/zigbee2mqtt
   zigbee2mqtt = "ghcr.io/koenkk/zigbee2mqtt:2.14.1@sha256:fef0de769dcd04c27b3a6d277b61046eb96284bdd4198dcb1687c3a01b3020f3";
