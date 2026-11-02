@@ -68,6 +68,12 @@
   # panes, re-run .zprofile and would otherwise accumulate duplicates)
   programs.zsh.envExtra = ''
     typeset -U path PATH
+
+    # macOS starts GUI apps, and so every terminal, with a soft limit of 256 open
+    # files, which nix and pixi installs routinely exceed. Raise it, never lower it.
+    if [[ $(ulimit -Sn) != unlimited ]] && (( $(ulimit -Sn) < 65536 )); then
+      ulimit -Sn 65536
+    fi
   '';
 
   # Contents of the previously unmanaged ~/.zprofile
