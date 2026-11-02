@@ -49,6 +49,10 @@ in
         Minute = 0;
       }];
 
+      # launchd's default soft limit is 256 open files; fetching the flake inputs
+      # into nix's git cache blows through that ("Too many open files")
+      SoftResourceLimits.NumberOfFiles = 65536;
+
       StandardOutPath = "/tmp/nix-update-stdout.log";
       StandardErrorPath = "/tmp/nix-update-stderr.log";
 
