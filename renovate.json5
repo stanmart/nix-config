@@ -51,14 +51,14 @@
   },
   lockFileMaintenance: {
     enabled: true,
-    // Its default schedule is Monday mornings only; the workflow's monthly cron
-    // decides when Renovate runs, so let it act on every run.
-    schedule: ["at any time"],
+    // flake.lock bumps rebuild every host, so keep them monthly. The workflow runs
+    // weekly on Mondays; exactly one of those runs falls in days 1-7.
+    schedule: ["* * 1-7 * *"],
   },
   // Digests are the whole point of the pinning scheme -- never drop them.
   pinDigests: true,
-  // Renovate only runs once a month, so an hourly cap would push the overflow to
-  // the next month rather than the next hour.
+  // Renovate only runs once a week, so an hourly cap would push the overflow to
+  // the next week rather than the next hour.
   prHourlyLimit: 0,
   timezone: "Europe/Zurich",
 }
