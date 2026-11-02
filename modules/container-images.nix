@@ -19,7 +19,7 @@
   mosquitto = "eclipse-mosquitto:2.0.22@sha256:09b62ff32c2e7b64d4b431b9a89236073289b68db273de2b089edeb9b0d92b5c";
 
   # renovate: datasource=docker depName=ghcr.io/koenkk/zigbee2mqtt
-  zigbee2mqtt = "ghcr.io/koenkk/zigbee2mqtt:2.14.1@sha256:fef0de769dcd04c27b3a6d277b61046eb96284bdd4198dcb1687c3a01b3020f3";
+  zigbee2mqtt = "ghcr.io/koenkk/zigbee2mqtt:2.14.3@sha256:fb4a6b0f6868ad1cd6a9996479802b2420e599c3463b62bbff8c8cd9a908f43a";
 
   # renovate: datasource=docker depName=nodered/node-red
   node-red = "nodered/node-red:4.1.15-22@sha256:7aa04e1c7be16aec5b4b4d6e64ae863c4720b0ab18e2c1f46905f7b0c71e3a19";
