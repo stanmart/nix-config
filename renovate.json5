@@ -27,12 +27,16 @@
       addLabels: ["dependencies", "containers"],
       // Digest-only churn is noise; roll it into the version PR.
       separateMinorPatch: false,
+      // One PR for all image bumps per run instead of one per image.
+      groupName: "container images",
     },
     {
       // Home Assistant ships a new minor every month and its breaking changes land
       // there, not in patches. Keep those PRs on their own so the release notes get read.
+      // A group of its own pulls them out of the "container images" group above.
       matchDepNames: ["ghcr.io/home-assistant/home-assistant"],
       matchUpdateTypes: ["minor", "major"],
+      groupName: "home-assistant",
       addLabels: ["review-release-notes"],
       automerge: false,
     },
@@ -47,14 +51,14 @@
   },
   lockFileMaintenance: {
     enabled: true,
-    // Its default schedule is Monday mornings only; the workflow's monthly cron
-    // decides when Renovate runs, so let it act on every run.
-    schedule: ["at any time"],
+    // flake.lock bumps rebuild every host, so keep them monthly. The workflow runs
+    // weekly on Mondays; exactly one of those runs falls in days 1-7.
+    schedule: ["* * 1-7 * *"],
   },
   // Digests are the whole point of the pinning scheme -- never drop them.
   pinDigests: true,
-  // Renovate only runs once a month, so an hourly cap would push the overflow to
-  // the next month rather than the next hour.
+  // Renovate only runs once a week, so an hourly cap would push the overflow to
+  // the next week rather than the next hour.
   prHourlyLimit: 0,
   timezone: "Europe/Zurich",
 }
