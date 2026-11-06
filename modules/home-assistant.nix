@@ -608,7 +608,12 @@ in
         5353 # mDNS -- HA discovery, and Matter commissioning
         1900 # SSDP
       ]
-      ++ lib.optional cfg.matterHub.enable 5540 # Matter operational discovery
+      # Matter operational traffic, one port per hub bridge: 5540 is paired with
+      # Apple Home, 5541 with Google Home (it skips what Google has natively).
+      ++ lib.optionals cfg.matterHub.enable [
+        5540
+        5541
+      ]
       # CoAP over DTLS for the TRÅDFRI app. Opened regardless of openFirewall: nginx
       # cannot front it, and DTLS-PSK is its own authentication.
       ++ lib.optional cfg.overgang.enable stack.ports.overgang;
