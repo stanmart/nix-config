@@ -39,7 +39,7 @@ class TileSliderCard extends HTMLElement {
     root.innerHTML = `
       <style>
         ha-card {
-          overflow: hidden;
+          overflow: visible;
         }
         .tile {
           --ha-card-border-width: 0;
@@ -59,12 +59,38 @@ class TileSliderCard extends HTMLElement {
           pointer-events: none;
         }
         .slider {
+          position: relative;
           flex: 1;
           min-width: 0;
           display: flex;
           cursor: pointer;
           touch-action: pan-y;
           -webkit-tap-highlight-color: transparent;
+        }
+        .tooltip {
+          position: absolute;
+          bottom: calc(100% - 2px);
+          left: 0;
+          transform: translateX(-50%) translateY(4px);
+          padding: 3px 8px;
+          border-radius: 999px;
+          background: var(--ha-card-background, var(--card-background-color, #1c1c1c));
+          color: var(--primary-text-color);
+          border: 1px solid var(--divider-color);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+          font-size: 12px;
+          font-weight: 500;
+          font-variant-numeric: tabular-nums;
+          line-height: 1.4;
+          white-space: nowrap;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 120ms ease, transform 120ms ease;
+          z-index: 2;
+        }
+        .tooltip.visible {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
         }
         input {
           flex: 1;
@@ -116,6 +142,7 @@ class TileSliderCard extends HTMLElement {
         <div class="tile"></div>
         <div class="row">
           <div class="slider">
+            <div class="tooltip" aria-hidden="true"></div>
             <input type="range" min="0" max="100" step="1" tabindex="-1" aria-label="Brightness" />
           </div>
         </div>
@@ -124,6 +151,8 @@ class TileSliderCard extends HTMLElement {
     this._tileHost = root.querySelector(".tile");
     this._row = root.querySelector(".row");
     this._slider = root.querySelector("input");
+    this._tooltip = root.querySelector(".tooltip");
+    this._hideTimer = null;
     this._lastLocal = 0;
     this._bindGestures(root.querySelector(".slider"));
   }
@@ -145,6 +174,18 @@ class TileSliderCard extends HTMLElement {
       this._lastLocal = Date.now();
       this._slider.value = pct;
       this._slider.classList.toggle("on", pct > 0);
+      clearTimeout(this._hideTimer);
+      this._tooltip.textContent = `${pct}%`;
+      this._tooltip.style.left = `calc(${THUMB_PX / 2}px + ${pct / 100} * (100% - ${THUMB_PX}px))`;
+      this._tooltip.classList.add("visible");
+    };
+    const hideTooltip = (delayMs = 0) => {
+      clearTimeout(this._hideTimer);
+      if (delayMs > 0) {
+        this._hideTimer = setTimeout(() => this._tooltip.classList.remove("visible"), delayMs);
+      } else {
+        this._tooltip.classList.remove("visible");
+      }
     };
     const capture = (id) => {
       try {
@@ -178,14 +219,17 @@ class TileSliderCard extends HTMLElement {
     });
     area.addEventListener("pointerup", (e) => {
       if (!start || e.pointerId !== start.id) return;
+      const wasDragging = start.dragging;
       start = null;
       const pct = valueAt(e.clientX);
       show(pct);
+      hideTooltip(wasDragging ? 150 : 500);
       this._apply(pct);
     });
     area.addEventListener("pointercancel", () => {
       if (!start) return;
       start = null;
+      hideTooltip(0);
       this._lastLocal = 0; // snap back to the light's real state
       this._update();
     });
