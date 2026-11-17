@@ -12,6 +12,7 @@ cask "copilot-cli"          # GitHub Copilot CLI
 cask "devtoys"              # swiss army knife for developers
 cask "ghostty"              # terminal emulator
 cask "handy"                # voice to text
+cask "herdr-app"            # herdr agent multiplexer desktop app
 cask "iina"                 # video player
 cask "keybase"              # secure messaging + file sharing
 cask "linearmouse"          # for remapping mouse buttons
@@ -36,6 +37,7 @@ cask "zed"                  # modern lightweight code editor
 # ---------------------------------------------
 
 brew "ffmpeg"               # for video processing
+brew "herdr"                # agent multiplexer for the terminal
 brew "nono"                 # sandbox for AI agents
 brew "npm"                  # package manager for JavaScript
 brew "opencode"             # Open-source coding agent
