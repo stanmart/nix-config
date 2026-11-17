@@ -48,6 +48,15 @@ let
       alert "home-manager updated, but brew bundle failed. See ~/Library/Logs/nix-update.log"
     fi
   '';
+
+  # When the switch changes this agent's plist, home-manager boots the agent out
+  # before installing the new one, and launchd kills the agent's processes along
+  # with it -- including the switch itself, which then never loads the agent again.
+  # Run the update in a new session instead, outside the agent's process group,
+  # so the agent exits right away and the update survives the bootout.
+  detachedUpdate = pkgs.writeShellScript "nix-update-detached" ''
+    exec /usr/bin/perl -MPOSIX -e 'exit 0 if fork; POSIX::setsid(); exec @ARGV or die "exec: $!"' ${updateScript}
+  '';
 in
 {
   launchd.agents.nix-update = {
@@ -57,7 +66,7 @@ in
       ProgramArguments = [
         "/bin/bash"
         "-c"
-        ''export PATH="/nix/var/nix/profiles/default/bin:$PATH"; exec ${updateScript}''
+        ''export PATH="/nix/var/nix/profiles/default/bin:$PATH"; exec ${detachedUpdate}''
       ];
 
       # Run weekly on Mondays at 5 AM
