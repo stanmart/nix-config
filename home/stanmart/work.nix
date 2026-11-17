@@ -93,9 +93,19 @@
   # Homebrew packages (auto-synced on every home-manager switch)
   home.file."Brewfile".source = ./assets/Brewfile;
 
+  # A brew failure must not abort activation, or the later steps (LaunchAgents
+  # among them) silently never run. Leave a marker for nix-update to report instead
+  # (path shared with macos-auto-update.nix).
   home.activation.brewBundle = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    /opt/homebrew/bin/brew trust --cask owenthereal/upterm/upterm
-    /opt/homebrew/bin/brew bundle --file ~/Brewfile --force
+    brewFailedMarker="$HOME/.local/state/nix-update/brew-bundle-failed"
+    mkdir -p "$(dirname "$brewFailedMarker")"
+    if /opt/homebrew/bin/brew trust --cask owenthereal/upterm/upterm \
+      && /opt/homebrew/bin/brew bundle --file ~/Brewfile --force; then
+      rm -f "$brewFailedMarker"
+    else
+      warnEcho "brew bundle failed, continuing activation without it"
+      date '+%Y-%m-%d %H:%M:%S' > "$brewFailedMarker"
+    fi
   '';
 
   # ~/.claude/settings.json is not a symlink so the Claude Code UI can write to it
